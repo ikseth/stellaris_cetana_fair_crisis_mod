@@ -7,6 +7,14 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-10
+
+### Fixed
+
+- Match the descriptor to the launcher's `modsCompatibilityVersion` (`4.4`).
+  This launcher compares against the major/minor compatibility marker rather
+  than the full `rawVersion` (`v4.4.6`) and does not expand wildcard values.
+
 ## [1.0.1] - 2026-08-10
 
 ### Fixed
@@ -32,6 +40,7 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Diagnostic logging with the `[Cetana Fair Crisis]` prefix.
 - Technical vanilla analysis and reproducible test plan.
 
-[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/releases/tag/v1.0.0

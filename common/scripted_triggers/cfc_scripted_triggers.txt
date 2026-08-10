@@ -1,10 +1,12 @@
 cfc_is_initial_cetana_fe_phase = {
 	has_global_flag = synth_queen_happened
-	has_global_flag = synth_queen_speech_1_happened
 	NOT = { has_global_flag = synth_queen_speech_2_happened }
 	NOT = { has_global_flag = synth_queen_defeated }
 	any_country = {
-		is_country_type = synth_queen
+		OR = {
+			is_country_type = synth_queen_storm
+			is_country_type = synth_queen
+		}
 	}
 	any_country = {
 		OR = {

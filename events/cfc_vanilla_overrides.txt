@@ -1,7 +1,113 @@
 namespace = crisis
 
-# Vanilla crisis.8042 deliberately destroys FE fleets and colonies and endlessly
-# reschedules itself. This replacement cleans existing state and does not reschedule.
+# Preserve the complete vanilla spawn effect while preventing its first action
+# from choosing and script-wiping a Fallen Empire capital.
+country_event = {
+	id = crisis.8005
+	hide_window = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = synth_queen_happened
+		endgame_telemetry = synth_queen
+		set_crisis_stage_1 = yes
+		cfc_prepare_safe_spawn = yes
+		if = {
+			limit = { exists = event_target:cfc_spawn_bastille_candidate }
+			synth_queen_spawn = yes
+			log = "[Cetana Fair Crisis] Scripted FE destruction intercepted at Cetana spawn."
+		}
+		else = {
+			# A galaxy with no empty non-FE system is not safely repairable by
+			# script. Preserve vanilla progress and emit an explicit diagnostic.
+			log = "[Cetana Fair Crisis] ERROR: no safe non-FE bastille candidate; vanilla spawn fallback used."
+			synth_queen_spawn = yes
+		}
+		cfc_restore_spawn_markers = yes
+		country_event = { id = cfc.1 }
+		country_event = { id = crisis.8010 days = 360 }
+		every_playable_country = {
+			limit = { is_ai = no }
+			country_event = { id = crisis.8035 days = 180 }
+		}
+	}
+}
+
+# Preserve both vanilla expansion timers and normal/non-FE expansion. FE/AE
+# territory receives the visible storm only; no colony/fleet wipe is called.
+country_event = {
+	id = crisis.8010
+	hide_window = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		random_system = {
+			limit = { has_modifier = queen_scorn_storm }
+			every_neighbor_system = {
+				limit = { synth_queen_can_steal_system = yes }
+				if = {
+					limit = {
+						exists = owner
+						owner = {
+							OR = {
+								is_country_type = fallen_empire
+								is_country_type = awakened_fallen_empire
+							}
+						}
+					}
+					add_modifier = { modifier = queen_scorn_storm days = -1 }
+					if = {
+						limit = { NOT = { has_global_flag = cfc_fe_expansion_intercepted } }
+						set_global_flag = cfc_fe_expansion_intercepted
+						log = "[Cetana Fair Crisis] Scripted FE destruction intercepted during storm expansion."
+					}
+				}
+				else = { synth_queen_wipe_system = yes }
+			}
+		}
+		country_event = { id = crisis.8015 days = 360 }
+	}
+}
+
+country_event = {
+	id = crisis.8015
+	hide_window = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_system = {
+			limit = { has_modifier = queen_scorn_storm }
+			every_neighbor_system = {
+				limit = { synth_queen_can_steal_system = yes }
+				if = {
+					limit = {
+						exists = owner
+						owner = {
+							OR = {
+								is_country_type = fallen_empire
+								is_country_type = awakened_fallen_empire
+							}
+						}
+					}
+					add_modifier = { modifier = queen_scorn_storm days = -1 }
+					if = {
+						limit = { NOT = { has_global_flag = cfc_fe_expansion_intercepted } }
+						set_global_flag = cfc_fe_expansion_intercepted
+						log = "[Cetana Fair Crisis] Scripted FE destruction intercepted during storm expansion."
+					}
+				}
+				else = { synth_queen_wipe_system = yes }
+			}
+		}
+		country_event = { id = crisis.8030 days = 360 }
+	}
+}
+
+# Vanilla crisis.8042 directly destroys FE fleets and colonies and reschedules
+# itself forever. Keep its Queen fleet top-up, normalize the FE, and stop there.
 country_event = {
 	id = crisis.8042
 	hide_window = yes
@@ -15,7 +121,15 @@ country_event = {
 	}
 
 	immediate = {
+		event_target:synth_queen_country_global = {
+			country_event = { id = crisis.8050 }
+		}
 		cfc_normalize_fallen_empire = yes
+		if = {
+			limit = { NOT = { has_global_flag = cfc_8042_intercepted } }
+			set_global_flag = cfc_8042_intercepted
+			log = "[Cetana Fair Crisis] Fleet scripted damage/destruction intercepted in crisis.8042."
+		}
 	}
 }
 

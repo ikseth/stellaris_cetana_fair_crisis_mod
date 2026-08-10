@@ -1,3 +1,86 @@
+cfc_prepare_safe_spawn = {
+	# Hide vanilla's preferred FE-capital marker long enough to make the original
+	# synth_queen_spawn effect select an empty, non-FE system instead.
+	every_galaxy_planet = {
+		limit = { has_carrier_flag = xenophobe_fe_capital }
+		set_carrier_flag = cfc_restore_xenophobe_fe_capital
+		remove_carrier_flag = xenophobe_fe_capital
+	}
+
+	# First preference: an entirely quiet system. The second pass only relaxes
+	# fleet/megastructure checks; neither pass ever accepts an FE/AE system or a
+	# system containing a colony.
+	random_galaxy_planet = {
+		limit = {
+			pop_amount < 1
+			NOR = {
+				is_star = yes
+				is_asteroid = yes
+				is_planet_class = pc_broken
+				is_planet_class = pc_shielded
+			}
+			solar_system = {
+				NOT = { any_system_planet = { is_colony = yes } }
+				NOT = { any_fleet_in_system = { always = yes } }
+				has_any_megastructure = no
+				OR = {
+					NOT = { exists = owner }
+					owner = { is_country_type = default }
+				}
+			}
+		}
+		save_global_event_target_as = cfc_spawn_bastille_candidate
+	}
+	if = {
+		limit = { NOT = { exists = event_target:cfc_spawn_bastille_candidate } }
+		random_galaxy_planet = {
+			limit = {
+				pop_amount < 1
+				NOR = {
+					is_star = yes
+					is_asteroid = yes
+					is_planet_class = pc_broken
+					is_planet_class = pc_shielded
+				}
+				solar_system = {
+					NOT = { any_system_planet = { is_colony = yes } }
+					OR = {
+						NOT = { exists = owner }
+						owner = { is_country_type = default }
+					}
+				}
+			}
+			save_global_event_target_as = cfc_spawn_bastille_candidate
+		}
+	}
+
+	if = {
+		limit = { exists = event_target:cfc_spawn_bastille_candidate }
+		event_target:cfc_spawn_bastille_candidate = {
+			if = {
+				limit = { NOT = { exists = owner } }
+				set_owner = root
+			}
+			set_carrier_flag = xenophobe_fe_capital
+		}
+	}
+}
+
+cfc_restore_spawn_markers = {
+	if = {
+		limit = { exists = event_target:cfc_spawn_bastille_candidate }
+		event_target:cfc_spawn_bastille_candidate = {
+			remove_carrier_flag = xenophobe_fe_capital
+		}
+		clear_global_event_target = cfc_spawn_bastille_candidate
+	}
+	every_galaxy_planet = {
+		limit = { has_carrier_flag = cfc_restore_xenophobe_fe_capital }
+		set_carrier_flag = xenophobe_fe_capital
+		remove_carrier_flag = cfc_restore_xenophobe_fe_capital
+	}
+}
+
 cfc_normalize_fallen_empire = {
 	if = {
 		limit = { has_modifier = beset_by_cetana }
@@ -12,25 +95,12 @@ cfc_normalize_fallen_empire = {
 	if = {
 		limit = { NOT = { has_country_flag = protected_from_queen_storm } }
 		set_country_flag = protected_from_queen_storm
-	}
-	every_system_within_border = {
-		if = {
-			limit = { has_modifier = queen_small_scorn_storm }
-			remove_modifier = queen_small_scorn_storm
-		}
-		if = {
-			limit = { has_modifier = queen_scorn_storm }
-			remove_modifier = queen_scorn_storm
-		}
-		if = {
-			limit = { has_modifier = queen_big_scorn_storm }
-			remove_modifier = queen_big_scorn_storm
-		}
+		log = "[Cetana Fair Crisis] Fleet scripted damage/destruction intercepted for [This.GetName]."
 	}
 	if = {
 		limit = { NOT = { has_country_flag = cfc_fe_normalized } }
 		set_country_flag = cfc_fe_normalized
-		log = "[Cetana Fair Crisis] Neutralized scripted FE/AE combat penalties and storm protection for [This.GetName]."
+		log = "[Cetana Fair Crisis] FE combat modifier normalized for [This.GetName]."
 	}
 }
 

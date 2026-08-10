@@ -1,0 +1,21 @@
+# Vanilla 4.4.6 definitions, with only the scripted FE/AE damage bias removed.
+# Keeping the same keys makes existing modifier instances use these definitions
+# after a save is loaded; Cetana does not need to be respawned or reinitialized.
+
+queen_combat_modifier = {
+	ship_speed_mult = 0.75
+	ship_hull_regen_add_perc = 0.1
+	country_war_exhaustion_mult = -5
+	damage_vs_country_type_ai_empire_mult = 2
+	damage_vs_country_type_extradimensional_mult = 2
+	damage_vs_country_type_extradimensional_2_mult = 2
+	damage_vs_country_type_extradimensional_3_mult = 2
+	damage_vs_country_type_swarm_mult = 2
+	ship_orbital_bombardment_mult = 5
+}
+
+# Kept as an empty compatibility definition because crisis.8030 may apply it
+# before the normalizer gets its next monthly pulse.
+beset_by_cetana = {
+	damage_vs_country_type_synth_queen_mult = 0
+}

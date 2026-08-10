@@ -1,0 +1,56 @@
+namespace = crisis
+
+# Vanilla crisis.8042 deliberately destroys FE fleets and colonies and endlessly
+# reschedules itself. This replacement cleans existing state and does not reschedule.
+country_event = {
+	id = crisis.8042
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			is_country_type = fallen_empire
+			is_country_type = awakened_fallen_empire
+		}
+	}
+
+	immediate = {
+		cfc_normalize_fallen_empire = yes
+	}
+}
+
+# Minimal override of the pre-second-speech custom diplomacy response. The first
+# option is new; the original close option is preserved verbatim.
+country_event = {
+	id = crisis.8063
+	title = "crisis.8063.name"
+	desc = "crisis.8063.desc"
+	picture = GFX_evt_vortex
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+
+	option = {
+		name = cfc.8063.intervene
+		trigger = {
+			is_ai = no
+			cfc_is_initial_cetana_fe_phase = yes
+			NOT = { is_at_war_with = event_target:synth_queen_country_global }
+		}
+		custom_tooltip = cfc.8063.intervene.tooltip
+		hidden_effect = {
+			set_country_flag = cfc_joined_early_cetana_war
+			set_country_flag = synth_queen_cannot_yeet_the_fleets
+			set_country_flag = protected_from_queen_storm
+			declare_war = {
+				target = event_target:synth_queen_country_global
+				name = cfc_cetana_intervention_war
+				attacker_war_goal = cfc_wg_intervene_cetana
+			}
+			log = "[Cetana Fair Crisis] [This.GetName] voluntarily declared war on Cetana during the FE phase."
+		}
+	}
+
+	option = {
+		name = crisis.8063.a
+	}
+}

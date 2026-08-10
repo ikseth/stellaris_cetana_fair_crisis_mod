@@ -1,0 +1,114 @@
+namespace = cfc
+
+# Initializer and low-frequency save normalizer. It only mutates state while the
+# confirmed vanilla FE phase is active, or while finishing an early-defeat cleanup.
+event = {
+	id = cfc.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { cfc_is_initial_cetana_fe_phase = yes }
+			if = {
+				limit = { NOT = { has_global_flag = cfc_initial_phase_active } }
+				set_global_flag = cfc_initial_phase_active
+				log = "[Cetana Fair Crisis] Cetana detected; initial Fallen/Awakened Empire phase active."
+			}
+			every_country = {
+				limit = {
+					OR = {
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+				cfc_normalize_fallen_empire = yes
+			}
+		}
+
+		if = {
+			limit = {
+				has_global_flag = cfc_initial_phase_active
+				has_global_flag = synth_queen_speech_2_happened
+				NOT = { has_global_flag = synth_queen_defeated }
+				NOT = { has_global_flag = cfc_early_defeat_pending }
+			}
+			remove_global_flag = cfc_initial_phase_active
+			log = "[Cetana Fair Crisis] Cetana won the initial war; control returned to the vanilla crisis chain."
+		}
+
+		if = {
+			limit = {
+				has_global_flag = cfc_early_defeat_pending
+				has_global_flag = synth_queen_defeated
+			}
+			cfc_cleanup_early_phase = yes
+			remove_global_flag = cfc_initial_phase_active
+			remove_global_flag = cfc_early_defeat_pending
+			set_global_flag = cfc_early_defeat_cleanup_done
+			log = "[Cetana Fair Crisis] Vanilla defeat flags detected; early-phase cleanup completed."
+		}
+	}
+}
+
+# Fired once for each war participant. Only normal empires actually fighting
+# Cetana receive the two vanilla bypass flags.
+country_event = {
+	id = cfc.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = default
+		has_global_flag = cfc_initial_phase_active
+		any_country = {
+			is_country_type = synth_queen
+			is_at_war_with = root
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { NOT = { has_country_flag = cfc_joined_early_cetana_war } }
+			set_country_flag = cfc_joined_early_cetana_war
+			set_country_flag = synth_queen_cannot_yeet_the_fleets
+			set_country_flag = protected_from_queen_storm
+			log = "[Cetana Fair Crisis] Enabled real hostility for voluntary participant [This.GetName]."
+		}
+	}
+}
+
+# Supplements vanilla crisis.23015. Vanilla remains the authority for end_crisis,
+# All Crises trackers, rewards, final notification, and destruction of Cetana.
+country_event = {
+	id = cfc.20
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		fromfromfrom = { is_ship_size = synth_queen_titan }
+		OR = {
+			has_global_flag = cfc_initial_phase_active
+			cfc_is_initial_cetana_fe_phase = yes
+			AND = {
+				has_global_flag = synth_queen_speech_1_happened
+				NOT = { has_global_flag = synth_queen_speech_2_happened }
+				any_country = {
+					OR = {
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		set_global_flag = cfc_early_defeat_pending
+		# Prevent crisis.8043 from starting the normal situation during the short
+		# vanilla crisis.23015 -> crisis.23005 cleanup window.
+		set_global_flag = synth_queen_speech_2_happened
+		cfc_cleanup_early_phase = yes
+		log = "[Cetana Fair Crisis] Cetana's Titan destroyed during the FE phase; vanilla crisis.23015 will finalize defeat."
+	}
+}

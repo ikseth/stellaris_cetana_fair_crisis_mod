@@ -1,0 +1,23 @@
+cfc_wg_intervene_cetana = {
+	casus_belli = cb_containment
+	hide = no_cb
+	total_war = yes
+
+	forbidden_peace_offers = {
+		demand_surrender = ""
+		status_quo = ""
+		surrender = ""
+	}
+	surrender_acceptance = -1000
+	set_defender_wargoal = wg_force_ideology
+
+	potential = {
+		is_country_type = default
+		from = { is_country_type = synth_queen }
+		cfc_is_initial_cetana_fe_phase = yes
+	}
+	possible = {
+		cfc_is_initial_cetana_fe_phase = yes
+	}
+	ai_weight = { weight = 0 }
+}

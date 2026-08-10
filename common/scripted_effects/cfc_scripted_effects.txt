@@ -1,0 +1,78 @@
+cfc_normalize_fallen_empire = {
+	if = {
+		limit = { has_modifier = beset_by_cetana }
+		remove_modifier = beset_by_cetana
+	}
+	if = {
+		limit = { has_country_flag = synth_queen_storm }
+		deactivate_fog_machine = yes
+		remove_country_flag = synth_queen_storm
+	}
+	remove_country_flag = weaker_navy
+	if = {
+		limit = { NOT = { has_country_flag = protected_from_queen_storm } }
+		set_country_flag = protected_from_queen_storm
+	}
+	every_system_within_border = {
+		if = {
+			limit = { has_modifier = queen_small_scorn_storm }
+			remove_modifier = queen_small_scorn_storm
+		}
+		if = {
+			limit = { has_modifier = queen_scorn_storm }
+			remove_modifier = queen_scorn_storm
+		}
+		if = {
+			limit = { has_modifier = queen_big_scorn_storm }
+			remove_modifier = queen_big_scorn_storm
+		}
+	}
+	if = {
+		limit = { NOT = { has_country_flag = cfc_fe_normalized } }
+		set_country_flag = cfc_fe_normalized
+		log = "[Cetana Fair Crisis] Neutralized scripted FE/AE combat penalties and storm protection for [This.GetName]."
+	}
+}
+
+cfc_cleanup_early_phase = {
+	every_country = {
+		limit = {
+			OR = {
+				is_country_type = fallen_empire
+				is_country_type = awakened_fallen_empire
+			}
+		}
+		if = {
+			limit = { has_modifier = beset_by_cetana }
+			remove_modifier = beset_by_cetana
+		}
+		if = {
+			limit = { has_country_flag = synth_queen_storm }
+			deactivate_fog_machine = yes
+		}
+		remove_country_flag = synth_queen_storm
+		remove_country_flag = weaker_navy
+		remove_country_flag = protected_from_queen_storm
+		remove_country_flag = cfc_fe_normalized
+		every_system_within_border = {
+			if = {
+				limit = { has_modifier = queen_small_scorn_storm }
+				remove_modifier = queen_small_scorn_storm
+			}
+			if = {
+				limit = { has_modifier = queen_scorn_storm }
+				remove_modifier = queen_scorn_storm
+			}
+			if = {
+				limit = { has_modifier = queen_big_scorn_storm }
+				remove_modifier = queen_big_scorn_storm
+			}
+		}
+	}
+	every_country = {
+		limit = { has_country_flag = cfc_joined_early_cetana_war }
+		remove_country_flag = cfc_joined_early_cetana_war
+		remove_country_flag = synth_queen_cannot_yeet_the_fleets
+		remove_country_flag = protected_from_queen_storm
+	}
+}

@@ -1,0 +1,19 @@
+on_game_start = {
+	events = { cfc.1 }
+}
+
+on_single_player_save_game_load = {
+	events = { cfc.1 }
+}
+
+on_monthly_pulse = {
+	events = { cfc.1 }
+}
+
+on_war_beginning = {
+	events = { cfc.10 }
+}
+
+on_ship_destroyed_perp = {
+	events = { cfc.20 }
+}

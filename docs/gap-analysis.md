@@ -9,6 +9,21 @@ mechanism. Vanilla has two earlier expansion passes plus an initial spawn wipe,
 all using `synth_queen_wipe_system`; these explain both observations from the
 test.
 
+There is also a decisive deployment finding: the inspected `2615.01.01` and
+`2616.07.01` saves contain no `cfc_` flag, while the current launcher state in
+`dlc_load.json` reports `"enabled_mods": []`. Those saves therefore did not run
+the installed CFC scripts. This explains why even the mechanisms already
+overridden in version 1.0.3 were still observed. Merely seeing the mod in the
+launcher library is not the same as enabling it in the playset used to load the
+save.
+
+The saves provide positive evidence for the vanilla paths: they contain
+`weaker_navy` and `synth_queen_storm`, proving that `crisis.8042` reached at
+least its storm and fleet-weakening stages. They also contain
+`synth_queen_failed_attack` and `synth_queen_shes_too_strong`, proving that a
+default-empire battle invoked `crisis.8065`. This is stronger than inference
+from the visual disappearance alone.
+
 ## Answers to the seven diagnostic questions
 
 ### 1. What removed the nanobot-marked Fallen Empire?
@@ -55,8 +70,13 @@ There are three initial-phase paths, distinguishable by condition:
 3. `crisis.8042` step 2 destroys 80% of the ships in a random mobile FE/AE
    fleet. This can happen far from an observed battle.
 
-The observed map disappearance is therefore consistent with MIA or direct
-script destruction and need not represent an extremely fast combat.
+For the inspected test saves, `weaker_navy` proves that `crisis.8042` destroyed
+the scripted 80% share of one selected FE/AE fleet. The same saves also show the
+storm stage, so `crisis.8024` remains a possible cause for fleets that crossed
+storm systems; the save format does not retain a per-ship event history that
+would map every observed fleet to one command. The default empire's observed
+failed attack is separately proven to be `crisis.8065`. These are scripted MIA
+or destruction paths, not merely extremely fast combat.
 
 ### 4. Is there scripted fleet destruction?
 

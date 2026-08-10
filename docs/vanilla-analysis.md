@@ -162,9 +162,11 @@ override them. Instead, it deliberately delegates final victory to
 
 | Vanilla key or hook | Mod behavior |
 |---|---|
+| `crisis.8005` | Selects an empty non-FE bastille candidate, then calls the full vanilla spawn effect. |
+| `crisis.8010`, `crisis.8015` | Preserve timers/normal expansion; replace FE/AE wipes with visual storm only. |
 | `queen_combat_modifier` | Removes only FE/AE-specific damage bonuses. |
 | `beset_by_cetana` | Neutralizes its damage penalty and removes live instances. |
-| `crisis.8042` | Replaces destructive/rescheduling behavior with one-shot cleanup. |
+| `crisis.8042` | Retains `crisis.8050`; replaces destructive/rescheduling behavior with one-shot cleanup. |
 | `crisis.8063` | Adds voluntary intervention while retaining the vanilla close option. |
 | `on_war_beginning` | Grants bypass flags only to countries actually fighting Cetana. |
 | `on_ship_destroyed_perp` | Detects an early Titan loss and prepares safe cleanup. |

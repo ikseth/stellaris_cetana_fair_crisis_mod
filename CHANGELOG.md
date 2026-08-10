@@ -7,6 +7,33 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added
+
+- Formal vanilla and Fair Crisis state machines, forced-victory inventory,
+  intervention matrix, gap analysis, save migration and T1–T11 test plan.
+- Static validator for script structure, IDs, localization, override allow-list,
+  destructive effects and accidental full vanilla copies.
+- One-shot diagnostic logs for every relevant Fair Crisis transition.
+
+### Fixed
+
+- Redirect Cetana's initial bastille away from Fallen/Awakened Empire capitals
+  while retaining the complete vanilla `synth_queen_spawn` effect.
+- Prevent `crisis.8010` and `crisis.8015` from calling the destructive system
+  wipe on FE/AE territory; retain their visual storm expansion.
+- Start FE/AE normalization during the silent `synth_queen_storm` stage, before
+  storm-entry damage can remove fleets.
+- Retain vanilla `crisis.8050` fleet replenishment when intercepting the
+  destructive branches of `crisis.8042`.
+- Normalize already-active voluntary wars after loading an existing save.
+
+### Diagnostics
+
+- Confirmed from the inspected test saves that `crisis.8042` had set
+  `weaker_navy` and that `crisis.8065` had recorded a failed default-empire
+  attack. The same saves had no CFC flags and the launcher reported no enabled
+  mods, so that particular test did not execute version 1.0.3.
+
 ## [1.0.3] - 2026-08-10
 
 ### Fixed

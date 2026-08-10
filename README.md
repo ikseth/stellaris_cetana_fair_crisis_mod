@@ -6,8 +6,9 @@ general ni alterar la cadena vanilla cuando Cetana vence.
 
 ## Resumen ejecutivo
 
-El mod mantiene intacta la aparición vanilla de Cetana, pero elimina las reglas
-que fuerzan prácticamente su victoria inicial:
+El mod conserva el efecto vanilla que crea a Cetana, sus naves y su territorio,
+pero redirige su planeta inicial a un sistema vacío para que no sacrifique un
+capital FE/AE y elimina las reglas que fuerzan prácticamente su victoria:
 
 - Cetana deja de recibir su `+200 %` específico de daño contra Imperios
   Caídos/Despertados.
@@ -15,6 +16,8 @@ que fuerzan prácticamente su victoria inicial:
   contra Cetana.
 - Se neutralizan la destrucción programada de flotas/colonias y la expulsión de
   flotas FE/AE por la tormenta durante esta fase.
+- Las expansiones vanilla `crisis.8010/8015` conservan los nanobots visuales al
+  alcanzar un FE/AE, pero no ejecutan allí el borrado de sistema.
 - Un imperio normal puede intervenir voluntariamente desde el contacto
   diplomático con Cetana, sin provocar una guerra automática para los demás.
 - Si Cetana vence a todos los FE/AE, `crisis.8043` recupera el control y toda la
@@ -47,10 +50,14 @@ Cetana.
 │   ├── cfc_events.txt
 │   └── cfc_vanilla_overrides.txt
 ├── docs/
+│   ├── cetana-fair-crisis-design.md
+│   ├── gap-analysis.md
+│   ├── testing.md
 │   └── vanilla-analysis.md
-└── localisation/
+├── localisation/
     ├── english/cfc_l_english.yml
     └── spanish/cfc_l_spanish.yml
+└── tools/validate_mod.sh
 ```
 
 ## Compatibilidad comprobada
@@ -76,26 +83,33 @@ Durante la fase anterior a `crisis.8043`:
    `+200 %` de daño contra FE y AE. Conserva velocidad, regeneración,
    agotamiento, bombardeo, escalado y bonus contra las demás crisis.
 2. Neutraliza y retira `beset_by_cetana` (`-90 %` de daño FE/AE contra Cetana).
-3. Sustituye `crisis.8042`, que en vanilla destruye el 80 % de una flota FE y
-   después colonias. El reemplazo sólo sanea el estado y no se reprograma.
-4. Da protección contra la tormenta a FE/AE para que `crisis.8024` no expulse o
+3. Redirige la selección inicial de `crisis.8005` a un planeta no habitado de un
+   sistema vacío que no pertenezca a FE/AE. Después llama al efecto vanilla
+   `synth_queen_spawn` completo.
+4. Intercepta en `crisis.8010/8015` sólo los sistemas FE/AE: añade el marcador
+   visual de tormenta, pero no llama a `synth_queen_wipe_system`.
+5. Sustituye `crisis.8042`, que en vanilla destruye el 80 % de una flota FE y
+   después colonias. El reemplazo conserva el refuerzo vanilla `crisis.8050`,
+   sanea el estado y no se reprograma.
+6. Da protección contra la tormenta a FE/AE para que `crisis.8024` no expulse o
    destruya sus flotas antes del combate.
-5. Añade un objetivo de guerra total de intervención. El contacto diplomático
+7. Añade un objetivo de guerra total de intervención. El contacto diplomático
    de Cetana entre sus discursos (`crisis.8063`) ofrece **Intervenir contra
    Cetana**. Sólo quien lo elige entra en guerra y recibe las flags vanilla que
    permiten atravesar la tormenta y evitan que `crisis.8065` deshaga el combate.
-6. Detecta la destrucción temprana del titán mediante el mismo
+8. Detecta la destrucción temprana del titán mediante el mismo
    `on_ship_destroyed_perp` que usa vanilla. El mod bloquea la transición tardía
    y sanea el estado de la fase; **`crisis.23015` vanilla sigue siendo quien
    ejecuta la derrota definitiva** (`end_crisis`, trackers de All Crises,
    recompensas, flags y cadena `crisis.23005/23010`).
-7. Normaliza saves nuevos o cargados al inicio/carga y, como respaldo para
+9. Normaliza saves nuevos o cargados al inicio/carga y, como respaldo para
    multijugador, en el pulso mensual. Sólo escribe logs cuando cambia una fase o
    un país necesita normalización.
 
 ## Qué no cambia
 
-- Aparición y creación vanilla (`crisis.8005` / `synth_queen_spawn`).
+- Creación de Cetana, país, Titan, flotas y bases por el efecto vanilla
+  `synth_queen_spawn`; sólo se prepara previamente un objetivo inicial seguro.
 - Potencia base, regeneración, velocidad, flotas, diseños o escalado de crisis.
 - Bonus de Cetana contra Contingencia, Prethoryn o extradimensionales.
 - Guerra automática: ningún imperio normal es añadido por el mod.
@@ -110,7 +124,8 @@ No se modifica ningún archivo de la instalación. El mod reemplaza únicamente:
 
 - `queen_combat_modifier` y `beset_by_cetana`, originalmente en
   `common/static_modifiers/22_static_modifiers_machine_age.txt`.
-- `crisis.8042` y `crisis.8063`, originalmente en
+- `crisis.8005`, `crisis.8010`, `crisis.8015`, `crisis.8042` y `crisis.8063`,
+  originalmente en
   `events/machine_age_crisis_events.txt`.
 
 Los on_actions son aditivos y el resto de claves usa el prefijo `cfc_` o el
@@ -126,8 +141,12 @@ Se puede activar con seguridad:
   `queen_combat_modifier` ya están aplicados.
 
 Las definiciones nuevas corrigen inmediatamente los valores de modificadores ya
-existentes. El normalizador elimina `beset_by_cetana`, la niebla y los
-modificadores de tormenta FE/AE sin crear otro país ni volver a disparar eventos.
+existentes. El normalizador elimina `beset_by_cetana` y la niebla scripted,
+protege a FE/AE frente al evento de entrada en tormenta y no crea otro país ni
+vuelve a disparar eventos. Los marcadores visuales de nanobots se conservan
+durante la fase.
+
+Un FE/AE ya eliminado por script no se recrea: hay que cargar un save anterior.
 
 No se recomienda activarlo después de `synth_queen_speech_2_happened`: para
 entonces la fase objetivo ya terminó y el mod deliberadamente no reescribe el
@@ -149,6 +168,11 @@ Copiar:
 Después, añadir **Cetana Fair Crisis** a un playset y activarlo. Si otro mod
 redefine los mismos modificadores o eventos, colocar éste después de ese mod.
 
+La biblioteca del launcher sólo confirma que el mod está instalado. Antes de
+cargar la partida, comprobar que el playset seleccionado lo muestra como
+**Enabled**. Un save activo debe adquirir la flag `cfc_initial_phase_active`
+durante la fase inicial; si no aparece y no hay logs CFC, el mod no se ejecutó.
+
 Usar un mod cambia el checksum y normalmente deshabilita logros en esa partida.
 
 ## Logging
@@ -164,10 +188,9 @@ Buscar `[Cetana Fair Crisis]` en `game.log`. Se registran:
 
 ## Plan de pruebas reproducible
 
-Para todos los casos, iniciar Stellaris con `-debug_mode`, activar `game.log` y
-guardar antes de la primera conversación de Cetana. Comprobar al final que
-`error.log` no contiene errores `cfc`, y que `game.log` muestra sólo las
-transiciones esperadas.
+El procedimiento T1–T11 completo está en
+[`docs/testing.md`](docs/testing.md). Para todos los casos, iniciar Stellaris con
+`-debug_mode`, activar `game.log` y guardar antes de `crisis.8005`.
 
 ### A — Cetana vence a todos los FE/AE
 
@@ -219,7 +242,7 @@ transiciones esperadas.
 
 - Conflicto directo con mods que redefinan `queen_combat_modifier`,
   `beset_by_cetana`, `crisis.8042` o `crisis.8063`; prevalece el último cargado.
-- Una actualización que cambie esos cuatro bloques exige comparar de nuevo el
+- Una actualización que cambie esos siete bloques exige comparar de nuevo el
   mod con vanilla. Por eso la compatibilidad declarada se limita a 4.4.x.
 - Stellaris no ofrece una operación de script general para cancelar eventos de
   país ya encolados. El reemplazo de `crisis.8042` es intencionado: las llamadas
@@ -239,6 +262,18 @@ transiciones esperadas.
   manual del mod.
 - Comprobación específica del orden de eventos cuando un FE/AE controlado por
   IA destruye el titán antes de que termine la fase inicial.
+
+La validación estática se ejecuta desde la raíz del repositorio con:
+
+```bash
+tools/validate_mod.sh
+```
+
+Opcionalmente puede contrastar también los IDs contra una instalación local:
+
+```bash
+tools/validate_mod.sh /ruta/a/steamapps/common/Stellaris
+```
 
 Esta validación es estática. Los escenarios A–G deben completarse dentro del
 juego antes de considerar certificada una versión para publicación pública.

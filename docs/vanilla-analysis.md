@@ -8,7 +8,8 @@ and integration points without reproducing complete copyrighted game files.
 
 - Game: Stellaris **Pegasus 4.4.6 (fdde)**
 - Steam build: **24109497**
-- Launcher mod compatibility marker: **4.4** (`modsCompatibilityVersion`)
+- Launcher raw version: **v4.4.6**. Mod descriptors use `v4.4.*`; current
+  launchers require the `v` prefix when evaluating `supported_version`.
 - Required DLC: **The Machine Age** (`dlc032_machine_age`)
 - Installation inspected:
   `/disk/sd_tb101/ignacio.garcia/steam_storage/steamapps/common/Stellaris`

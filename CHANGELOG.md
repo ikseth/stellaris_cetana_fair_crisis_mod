@@ -7,6 +7,14 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-08-10
+
+### Fixed
+
+- Add the mandatory `v` prefix to `supported_version` and use `v4.4.*`, matching
+  the game's `rawVersion` format (`v4.4.6`). Stellaris launchers since 3.12
+  reject otherwise correct version numbers when this prefix is absent.
+
 ## [1.0.2] - 2026-08-10
 
 ### Fixed
@@ -40,7 +48,8 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Diagnostic logging with the `[Cetana Fair Crisis]` prefix.
 - Technical vanilla analysis and reproducible test plan.
 
-[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/releases/tag/v1.0.0

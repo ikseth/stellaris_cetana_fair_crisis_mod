@@ -57,7 +57,8 @@ Cetana.
 
 - Stellaris **Pegasus 4.4.6 (fdde)**, Steam build **24109497**.
 - DLC requerido: **The Machine Age** (`dlc032_machine_age`).
-- `supported_version`: `4.4.*`.
+- `supported_version`: `4.4.6` (coincide exactamente con la versión validada
+  para evitar avisos incorrectos del launcher con patrones wildcard).
 
 El análisis y el código se hicieron contra los archivos instalados en:
 

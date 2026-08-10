@@ -7,6 +7,16 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-10
+
+### Fixed
+
+- Set `supported_version` to the exact validated game version (`4.4.6`) because
+  the current Paradox Launcher incorrectly warned about the `4.4.*` wildcard.
+- Avoid installing the repository's external `.mod` descriptor inside the mod
+  content directory; only the top-level launcher descriptor and internal
+  `descriptor.mod` are required.
+
 ## [1.0.0] - 2026-08-10
 
 ### Added
@@ -22,5 +32,6 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Diagnostic logging with the `[Cetana Fair Crisis]` prefix.
 - Technical vanilla analysis and reproducible test plan.
 
-[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/releases/tag/v1.0.0

@@ -23,6 +23,8 @@ because minor game updates can move definitions without changing their IDs.
 
 - `crisis.8005`: starts the crisis, sets `synth_queen_happened`, advances the
   crisis stage, and calls `synth_queen_spawn`.
+- `crisis.8010` and `crisis.8015`: two 360-day expansion passes. Each calls
+  `synth_queen_wipe_system` for eligible neighbouring systems.
 - `crisis.8024`: intercepts fleets entering systems covered by
   `queen_scorn_storm`. Unprotected fleets are damaged, destroyed, or sent MIA;
   FE/AE fleets receive especially destructive handling.
@@ -51,14 +53,21 @@ because minor game updates can move definitions without changing their IDs.
 - `crisis.23005` and `crisis.23010`: final speech, removal of remaining Cetana
   country types, rewards, and post-crisis storm/modifier cleanup.
 
-The mod replaces only `crisis.8042` and `crisis.8063`; it does not copy or
-replace the complete Machine Age crisis event file.
+The corrected mod replaces only small event definitions by ID; it does not copy
+or replace the complete Machine Age crisis event file. The exact override list
+is maintained in the README and design document.
 
 ### `common/scripted_effects/02_machine_age_effects.txt`
 
 - `synth_queen_spawn`: creates the Cetana species and country, initially as
-  `synth_queen_storm`; applies `queen_combat_modifier`; saves both the local and
-  global country event targets; creates the Titan and initial fleets.
+  `synth_queen_storm`; preferentially selects a xenophobe or other non-machine
+  FE capital; destroys the selected colony/system; applies
+  `queen_combat_modifier`; saves both the local and global country event
+  targets; creates the Titan and initial fleets.
+- `synth_queen_wipe_planet`: marks the bastille and destroys its colony.
+- `synth_queen_wipe_system`: destroys colonies, deletes stations, directly
+  destroys AE and other non-default/non-FE fleets, damages/destroys FE/default
+  ships and sends their fleet MIA, converts worlds and applies Queen storm.
 - `synth_queen_fe_war`: makes each existing FE/AE declare a real event-driven
   war against `synth_queen_country_global`. It does not add normal empires.
 - `synth_queen_scion_warning`: preserves the special Scion handling before the
@@ -121,6 +130,16 @@ vanilla on_actions file.
 `is_synth_queen_country_type` groups the main storm, normal, and awakened
 Cetana country types. The mod uses vanilla country types but adds its own phase
 trigger.
+
+`synth_queen_can_steal_system` permits free systems, every non-default owner
+(including FE/AE), and empty default-owned systems. It is the condition that
+lets `crisis.8010/8015` feed FE/AE systems to the destructive wipe effect.
+
+### `common/ship_sizes/26_synth_queen.txt`
+
+`synth_queen_titan` has large vanilla hull/armor/shield values, damage and fire
+rate bonuses, regeneration and `never_mia = yes`. It does not declare scripted
+invulnerability. The mod does not replace its ship size or design.
 
 ### `common/situations/08_machine_age_situations.txt`
 

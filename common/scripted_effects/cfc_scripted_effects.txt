@@ -8,7 +8,7 @@ cfc_prepare_safe_spawn = {
 	}
 
 	# First preference: an entirely quiet system. The second pass only relaxes
-	# fleet/megastructure checks; neither pass ever accepts an FE/AE system or a
+	# the megastructure check; neither pass ever accepts an FE/AE system or a
 	# system containing a colony.
 	random_galaxy_planet = {
 		limit = {
@@ -21,7 +21,7 @@ cfc_prepare_safe_spawn = {
 			}
 			solar_system = {
 				NOT = { any_system_planet = { is_colony = yes } }
-				NOT = { any_fleet_in_system = { always = yes } }
+				NOT = { any_fleet_in_system = { is_mobile = yes } }
 				has_any_megastructure = no
 				OR = {
 					NOT = { exists = owner }
@@ -44,6 +44,7 @@ cfc_prepare_safe_spawn = {
 				}
 				solar_system = {
 					NOT = { any_system_planet = { is_colony = yes } }
+					NOT = { any_fleet_in_system = { is_mobile = yes } }
 					OR = {
 						NOT = { exists = owner }
 						owner = { is_country_type = default }

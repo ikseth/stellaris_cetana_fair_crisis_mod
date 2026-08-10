@@ -11,6 +11,16 @@
   at slowest speed, and inspect both the battle report and CFC log transitions.
 - Search logs for `[Cetana Fair Crisis]`; there should be no daily/monthly spam.
 
+### Mandatory preflight
+
+1. In the launcher's selected playset, verify that **Cetana Fair Crisis 1.1.0**
+   is enabled, not merely present in the library.
+2. After launch, verify that `dlc_load.json` lists
+   `mod/cetana_fair_crisis.mod` under `enabled_mods`.
+3. Load the pre-`crisis.8005` save and verify the first CFC detection logs after
+   Cetana appears. If no `cfc_initial_phase_active` flag and no CFC log exists,
+   stop: that run is unmodded and cannot validate any scenario below.
+
 ## T1 — first Fallen Empire
 
 1. Load immediately before Cetana appears.

@@ -31,6 +31,9 @@ Cetana.
 
 ```text
 .
+├── .gitignore
+├── CHANGELOG.md
+├── LICENSE
 ├── README.md
 ├── descriptor.mod
 ├── cetana_fair_crisis.mod
@@ -43,6 +46,8 @@ Cetana.
 ├── events/
 │   ├── cfc_events.txt
 │   └── cfc_vanilla_overrides.txt
+├── docs/
+│   └── vanilla-analysis.md
 └── localisation/
     ├── english/cfc_l_english.yml
     └── spanish/cfc_l_spanish.yml
@@ -57,6 +62,10 @@ Cetana.
 El análisis y el código se hicieron contra los archivos instalados en:
 
 `/disk/sd_tb101/ignacio.garcia/steam_storage/steamapps/common/Stellaris`
+
+La relación concisa de archivos, eventos, efectos y puntos de integración
+vanilla está en [`docs/vanilla-analysis.md`](docs/vanilla-analysis.md). El
+repositorio no contiene archivos completos ni recursos de la instalación.
 
 ## Qué cambia
 

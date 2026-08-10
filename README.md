@@ -44,6 +44,7 @@ Cetana.
 │   ├── on_actions/cfc_on_actions.txt
 │   ├── scripted_effects/cfc_scripted_effects.txt
 │   ├── scripted_triggers/cfc_scripted_triggers.txt
+│   ├── solar_system_initializers/cfc_safe_bastille_initializer.txt
 │   ├── static_modifiers/cfc_queen_combat_modifiers.txt
 │   └── war_goals/cfc_cetana_war_goal.txt
 ├── events/
@@ -85,7 +86,9 @@ Durante la fase anterior a `crisis.8043`:
 2. Neutraliza y retira `beset_by_cetana` (`-90 %` de daño FE/AE contra Cetana).
 3. Redirige la selección inicial de `crisis.8005` a un planeta no habitado de un
    sistema vacío que no pertenezca a FE/AE. Después llama al efecto vanilla
-   `synth_queen_spawn` completo.
+   `synth_queen_spawn` completo. Si una galaxia completamente ocupada no ofrece
+   ninguno, crea un sistema mínimo aislado como fallback; nunca vuelve a elegir
+   un capital FE/AE.
 4. Intercepta en `crisis.8010/8015` sólo los sistemas FE/AE: añade el marcador
    visual de tormenta, pero no llama a `synth_queen_wipe_system`.
 5. Sustituye `crisis.8042`, que en vanilla destruye el 80 % de una flota FE y

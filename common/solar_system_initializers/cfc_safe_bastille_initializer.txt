@@ -1,0 +1,25 @@
+cfc_safe_bastille_system = {
+	name = "CFC_SAFE_BASTILLE_SYSTEM"
+	class = sc_g
+	flags = { cfc_safe_bastille_system }
+
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 24
+		has_ring = no
+	}
+
+	change_orbit = 40
+
+	planet = {
+		name = "CFC_SAFE_BASTILLE_WORLD"
+		class = pc_barren
+		orbit_distance = 40
+		orbit_angle = 90
+		size = 16
+		flags = { cfc_safe_bastille_world }
+	}
+}

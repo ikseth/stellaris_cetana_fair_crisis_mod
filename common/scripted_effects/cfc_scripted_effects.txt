@@ -54,6 +54,24 @@ cfc_prepare_safe_spawn = {
 			save_global_event_target_as = cfc_spawn_bastille_candidate
 		}
 	}
+	if = {
+		limit = { NOT = { exists = event_target:cfc_spawn_bastille_candidate } }
+		# Pathological fully occupied galaxies get a tiny isolated fallback rather
+		# than ever reverting to vanilla's forced FE-capital sacrifice.
+		random_rim_system = {
+			spawn_system = {
+				min_distance >= 20
+				max_distance <= 50
+				initializer = "cfc_safe_bastille_system"
+				effect = {
+					random_system_planet = {
+						limit = { has_carrier_flag = cfc_safe_bastille_world }
+						save_global_event_target_as = cfc_spawn_bastille_candidate
+					}
+				}
+			}
+		}
+	}
 
 	if = {
 		limit = { exists = event_target:cfc_spawn_bastille_candidate }
@@ -72,6 +90,7 @@ cfc_restore_spawn_markers = {
 		limit = { exists = event_target:cfc_spawn_bastille_candidate }
 		event_target:cfc_spawn_bastille_candidate = {
 			remove_carrier_flag = xenophobe_fe_capital
+			remove_carrier_flag = cfc_safe_bastille_world
 		}
 		clear_global_event_target = cfc_spawn_bastille_candidate
 	}

@@ -4,3 +4,5 @@
  war_goal_cfc_wg_intervene_cetana: "Intervenir contra Cetana"
  war_goal_cfc_wg_intervene_cetana_desc: "Una guerra total para destruir a Cetana antes de que complete su venganza contra los Imperios Caídos."
  cfc_cetana_intervention_war: "Guerra anticipada contra Cetana"
+ CFC_SAFE_BASTILLE_SYSTEM: "Extensión de Somnivaya"
+ CFC_SAFE_BASTILLE_WORLD: "Bastilla Silenciosa"

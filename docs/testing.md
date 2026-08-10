@@ -27,9 +27,10 @@
 2. Let `crisis.8005`, `8010`, and `8015` fire naturally.
 3. Inspect the original FE capitals and the nanobot-marked frontier systems.
 
-Expected: Cetana appears from a safe uncolonized bastille. No FE/AE colony or
-country disappears from a scripted spawn/expansion wipe. Visual storm expansion
-may still appear.
+Expected: Cetana appears from a safe uncolonized bastille (or the minimal CFC
+fallback system in a completely occupied galaxy). No FE/AE colony or country
+disappears from a scripted spawn/expansion wipe. Visual storm expansion may
+still appear.
 
 ## T2 — FE fleet enters Cetana territory
 

@@ -92,7 +92,7 @@ initial FE phase and remain untouched.
 
 | Vanilla mechanism | Decision | Reason | Implementation |
 |---|---|---|---|
-| `crisis.8005` + `synth_queen_spawn` | modify narrowly | Preserve the full spawn but prevent its preferential FE-capital sacrifice. | Small event override prepares a safe, uncolonized bastille candidate, calls the original effect, then starts Fair Crisis normalization. |
+| `crisis.8005` + `synth_queen_spawn` | modify narrowly | Preserve the full spawn but prevent its preferential FE-capital sacrifice. | Small event override prepares a safe, uncolonized bastille candidate, creates a minimal isolated fallback system only if necessary, calls the original effect, then starts Fair Crisis normalization. |
 | `crisis.8010` / `crisis.8015` | modify narrowly | Their call to the global wipe effect destroys FE/AE colonies and fleets. | Small event overrides retain timers and normal expansion; FE/AE systems receive only the visual storm marker. |
 | `synth_queen_wipe_system` | preserve | Used by later vanilla content and safe initial targets; a global override would be broad and incompatible. | Calls are intercepted only at initial-phase callers. |
 | `queen_combat_modifier` | modify | Remove only the two FE/AE-specific damage entries. | Key-level static modifier override preserving all other entries. |
@@ -158,3 +158,10 @@ ID. An old save that already queued `crisis.8042` will call the harmless CFC
 replacement. The same limitation makes restoration of an already destroyed FE
 unsafe: its original pops, leaders, fleets, diplomacy and event scopes cannot be
 reconstructed losslessly.
+
+The safe-spawn selector first reuses a colony-free, non-FE/AE system. If none
+exists, `cfc_safe_bastille_system` is spawned at the rim and consumed by the
+otherwise unchanged vanilla spawn effect. If even engine placement of that
+system fails, the mod logs an error and refuses to call the FE-destructive
+fallback; preserving the fair-war invariant takes precedence over advancing a
+pathological broken spawn.

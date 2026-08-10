@@ -18,7 +18,9 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ### Fixed
 
 - Redirect Cetana's initial bastille away from Fallen/Awakened Empire capitals
-  while retaining the complete vanilla `synth_queen_spawn` effect.
+  while retaining the complete vanilla `synth_queen_spawn` effect. Fully
+  occupied galaxies receive a minimal isolated fallback system rather than
+  reverting to the FE-capital sacrifice.
 - Prevent `crisis.8010` and `crisis.8015` from calling the destructive system
   wipe on FE/AE territory; retain their visual storm expansion.
 - Start FE/AE normalization during the silent `synth_queen_storm` stage, before

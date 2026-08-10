@@ -19,17 +19,19 @@ country_event = {
 			log = "[Cetana Fair Crisis] Scripted FE destruction intercepted at Cetana spawn."
 		}
 		else = {
-			# A galaxy with no empty non-FE system is not safely repairable by
-			# script. Preserve vanilla progress and emit an explicit diagnostic.
-			log = "[Cetana Fair Crisis] ERROR: no safe non-FE bastille candidate; vanilla spawn fallback used."
-			synth_queen_spawn = yes
+			# Do not violate the core invariant if the engine cannot place even the
+			# isolated fallback system. The error is explicit and no FE is wiped.
+			log = "[Cetana Fair Crisis] ERROR: safe bastille placement failed; Cetana spawn stopped to protect FE/AE state."
 		}
 		cfc_restore_spawn_markers = yes
-		country_event = { id = cfc.1 }
-		country_event = { id = crisis.8010 days = 360 }
-		every_playable_country = {
-			limit = { is_ai = no }
-			country_event = { id = crisis.8035 days = 180 }
+		if = {
+			limit = { any_country = { is_country_type = synth_queen_storm } }
+			country_event = { id = cfc.1 }
+			country_event = { id = crisis.8010 days = 360 }
+			every_playable_country = {
+				limit = { is_ai = no }
+				country_event = { id = crisis.8035 days = 180 }
+			}
 		}
 	}
 }

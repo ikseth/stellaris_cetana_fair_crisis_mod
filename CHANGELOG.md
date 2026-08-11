@@ -7,6 +7,29 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-08-11
+
+First release actually loaded by the game with the mod enabled in a playset.
+The three defects below were found in that run's `error.log`.
+
+### Fixed
+
+- `cfc.1` was fired from the `crisis.8005` override with `country_event`, but it
+  is declared as a scopeless `event`. The engine rejected the call, so detection
+  at spawn was skipped and only the next monthly pulse installed the phase.
+- `cfc_queen_reinforce` used `$CAP$` inside its log string. The macro
+  preprocessor scans quoted text too and reported an invalid macro entry on
+  every load.
+- `cfc_wg_intervene_cetana` had no `GFX_cfc_wg_intervene_cetana` sprite, logged
+  on every start. Added `interface/cfc_war_goals.gfx`, which references the
+  vanilla diplomacy war texture by path.
+
+### Added
+
+- Validator checks for all three classes of defect: war goal icons, macro
+  parameters inside log strings, and event fire scopes that disagree with the
+  event's own declaration. Brace balancing now also covers `interface/`.
+
 ## [1.2.0] - 2026-08-11
 
 ### Added
@@ -114,7 +137,8 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Diagnostic logging with the `[Cetana Fair Crisis]` prefix.
 - Technical vanilla analysis and reproducible test plan.
 
-[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.2...v1.0.3

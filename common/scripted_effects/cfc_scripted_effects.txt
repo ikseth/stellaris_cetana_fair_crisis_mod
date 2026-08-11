@@ -170,7 +170,9 @@ cfc_queen_reinforce = {
 		}
 		synth_queen_create_war_fleet = yes
 	}
-	log = "[Cetana Fair Crisis] Cetana reinforcement wave capped at $CAP$ fleets."
+	# The cap is deliberately absent from this string: the macro preprocessor
+	# also scans quoted text, and a $CAP$ here is reported as an invalid macro.
+	log = "[Cetana Fair Crisis] Cetana reinforcement wave applied."
 }
 
 cfc_cleanup_early_phase = {

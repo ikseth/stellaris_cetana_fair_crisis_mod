@@ -26,7 +26,9 @@ country_event = {
 		cfc_restore_spawn_markers = yes
 		if = {
 			limit = { any_country = { is_country_type = synth_queen_storm } }
-			country_event = { id = cfc.1 }
+			# cfc.1 is a scopeless event, so it must not be fired as a country
+			# event; doing so silently skipped the detection at spawn time.
+			event = { id = cfc.1 }
 			country_event = { id = crisis.8010 days = 360 }
 			every_playable_country = {
 				limit = { is_ai = no }

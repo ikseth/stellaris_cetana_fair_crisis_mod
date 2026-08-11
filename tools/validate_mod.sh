@@ -48,8 +48,20 @@ while IFS= read -r script; do
 	' "$script"; then
 		fail "unbalanced braces: ${script#"$repo_root"/}"
 	fi
-done < <(find "$repo_root/common" "$repo_root/events" -type f -name '*.txt' -print | sort)
+done < <(find "$repo_root/common" "$repo_root/events" "$repo_root/interface" \
+	-type f \( -name '*.txt' -o -name '*.gfx' \) -print | sort)
 note "Clausewitz script braces are balanced"
+
+while IFS= read -r war_goal; do
+	key=${war_goal##*/}
+	key=${key%.txt}
+	while IFS= read -r declared; do
+		if ! search_quiet "name[[:space:]]*=[[:space:]]*\"GFX_$declared\"" "$repo_root"/interface/*.gfx; then
+			fail "war goal $declared has no GFX_$declared sprite"
+		fi
+	done < <(sed -nE 's/^([a-z_][a-z0-9_]*)[[:space:]]*=[[:space:]]*\{.*/\1/p' "$war_goal")
+done < <(find "$repo_root/common/war_goals" -type f -name '*.txt' -print | sort)
+note "war goal icons declared"
 
 duplicate_cfc_ids=$(sed -nE 's/^[[:space:]]*id[[:space:]]*=[[:space:]]*(cfc\.[0-9]+).*/\1/p' \
 	"$repo_root"/events/*.txt | sort | uniq -d)
@@ -58,6 +70,38 @@ if [[ -n $duplicate_cfc_ids ]]; then
 else
 	note "CFC event IDs are unique"
 fi
+
+# The macro preprocessor also scans quoted text, so a $PARAM$ inside a log
+# string is reported as an invalid macro entry at load time.
+if search_recursive '^[[:space:]]*log[[:space:]]*=[[:space:]]*".*\$.*\$.*"' \
+	"$repo_root/common" "$repo_root/events"; then
+	fail "log string contains a macro parameter"
+else
+	note "log strings are macro-free"
+fi
+
+# Firing a scopeless event with country_event (or the reverse) is accepted by
+# the parser and only fails at runtime, silently skipping the event.
+declarations=$(awk '
+	/^[[:space:]]*(country_)?event[[:space:]]*=[[:space:]]*\{/ {
+		kind = ($0 ~ /country_event/) ? "country" : "scopeless"
+	}
+	/^[[:space:]]*id[[:space:]]*=[[:space:]]*cfc\./ {
+		id = $3
+		print kind, id
+	}
+' "$repo_root"/events/*.txt)
+while IFS= read -r reference; do
+	kind=${reference%% *}
+	id=${reference##* }
+	declared=$(printf '%s\n' "$declarations" | awk -v want="$id" '$2 == want { print $1 }')
+	if [[ -n $declared && $declared != "$kind" ]]; then
+		fail "$id is declared as a $declared event but fired as a $kind event"
+	fi
+done < <(sed -nE 's/^[[:space:]]*(country_)?event[[:space:]]*=[[:space:]]*\{[[:space:]]*id[[:space:]]*=[[:space:]]*(cfc\.[0-9]+).*/\1\2/p' \
+	"$repo_root"/events/*.txt "$repo_root"/common/*/*.txt \
+	| sed -E 's/^country_/country /; s/^cfc/scopeless cfc/')
+note "CFC event fire scopes match their declarations"
 
 actual_overrides=$(sed -nE 's/^[[:space:]]*id[[:space:]]*=[[:space:]]*(crisis\.[0-9]+).*/\1/p' \
 	"$repo_root/events/cfc_vanilla_overrides.txt" | sort | tr '\n' ' ')

@@ -58,6 +58,7 @@ Cetana.
 ├── events/
 │   ├── cfc_events.txt
 │   └── cfc_vanilla_overrides.txt
+├── interface/cfc_war_goals.gfx
 ├── docs/
 │   ├── cetana-fair-crisis-design.md
 │   ├── gap-analysis.md

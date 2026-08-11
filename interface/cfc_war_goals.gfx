@@ -1,0 +1,13 @@
+# Stellaris resolves a war goal's icon from a sprite named GFX_<war_goal_key>.
+# Without this entry the game logs "War Goal `cfc_wg_intervene_cetana` lacks a
+# valid icon" on every start. The texture is the vanilla diplomacy war icon,
+# referenced by path; no asset is copied into this repository.
+
+spriteTypes = {
+
+	spriteType = {
+		name = "GFX_cfc_wg_intervene_cetana"
+		texturefile = "gfx/interface/icons/diplomacy/diplomacy_war.dds"
+		noOfFrames = 2
+	}
+}

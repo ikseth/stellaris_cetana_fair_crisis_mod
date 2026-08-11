@@ -26,6 +26,7 @@ event = {
 					}
 				}
 				cfc_normalize_fallen_empire = yes
+				country_event = { id = cfc.30 }
 			}
 			every_country = {
 				limit = {
@@ -33,6 +34,15 @@ event = {
 					is_at_war_with = event_target:synth_queen_country_global
 				}
 				country_event = { id = cfc.10 }
+			}
+			every_country = {
+				limit = {
+					is_country_type = default
+					is_ai = yes
+					NOT = { has_country_flag = cfc_joined_early_cetana_war }
+					NOT = { has_country_flag = cfc_intervention_cooldown }
+				}
+				country_event = { id = cfc.40 }
 			}
 		}
 
@@ -124,6 +134,183 @@ country_event = {
 			cfc_cleanup_early_phase = yes
 			log = "[Cetana Fair Crisis] Cetana early defeat detected."
 			log = "[Cetana Fair Crisis] Vanilla cleanup invoked."
+		}
+	}
+}
+
+# Monthly, once per Fallen/Awakened Empire. Two independent guards:
+#   1. Cetana only removes an FE that has genuinely lost its war, replacing the
+#      unconditional vanilla crisis.8042 colony grind.
+#   2. A status quo peace cannot freeze the crisis in the FE phase forever;
+#      vanilla could never reach that state because its grind never stopped.
+country_event = {
+	id = cfc.30
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			is_country_type = fallen_empire
+			is_country_type = awakened_fallen_empire
+		}
+		has_country_flag = cfc_fe_counters_ready
+		exists = event_target:synth_queen_country_global
+		cfc_is_initial_cetana_fe_phase = yes
+		# cfc.1 also runs on load, so without this the counters below would
+		# advance faster than one step per month in a reload-heavy session.
+		NOT = { has_country_flag = cfc_fe_tick_recent }
+	}
+
+	immediate = {
+		set_timed_country_flag = { flag = cfc_fe_tick_recent days = 25 }
+		if = {
+			limit = {
+				has_global_flag = synth_queen_speech_1_happened
+				NOT = { is_at_war_with = event_target:synth_queen_country_global }
+			}
+			change_variable = { which = cfc_peace_months value = 1 }
+		}
+		else = {
+			set_variable = { which = cfc_peace_months value = 0 }
+		}
+		if = {
+			limit = { check_variable = { which = cfc_peace_months value >= 12 } }
+			set_variable = { which = cfc_peace_months value = 0 }
+			declare_war = {
+				target = event_target:synth_queen_country_global
+				name = cetana_war
+				attacker_war_goal = wg_end_threat
+			}
+			log = "[Cetana Fair Crisis] Reopened the stalled Cetana war for [This.GetName]."
+		}
+
+		if = {
+			limit = { cfc_fallen_empire_is_militarily_broken = yes }
+			change_variable = { which = cfc_collapse_months value = 1 }
+		}
+		else = {
+			set_variable = { which = cfc_collapse_months value = 0 }
+		}
+		# Last statement of the event: this scope can stop existing inside it.
+		if = {
+			limit = { check_variable = { which = cfc_collapse_months value >= 6 } }
+			set_variable = { which = cfc_collapse_months value = 0 }
+			cfc_collapse_fallen_empire = yes
+		}
+	}
+}
+
+# At most one roll per AI empire per year while the FE phase lasts. Normal
+# empires are never enlisted by script: each one weighs its own fleet strength
+# and ethics against Cetana, exactly as the player weighs the crisis.8063 option.
+country_event = {
+	id = cfc.40
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = default
+		is_ai = yes
+		exists = event_target:synth_queen_country_global
+		cfc_is_initial_cetana_fe_phase = yes
+		has_global_flag = synth_queen_speech_1_happened
+		NOT = { has_country_flag = cfc_joined_early_cetana_war }
+		NOT = { has_country_flag = cfc_intervention_cooldown }
+		NOT = { is_at_war_with = event_target:synth_queen_country_global }
+	}
+
+	immediate = {
+		set_timed_country_flag = { flag = cfc_intervention_cooldown days = 360 }
+		random_list = {
+			88 = { }
+			12 = {
+				modifier = {
+					factor = 0
+					NOT = {
+						relative_power = {
+							who = event_target:synth_queen_country_global
+							category = fleet
+							value >= equivalent
+						}
+					}
+				}
+				modifier = {
+					factor = 2
+					relative_power = {
+						who = event_target:synth_queen_country_global
+						category = fleet
+						value >= superior
+					}
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						has_ethic = ethic_militarist
+						has_ethic = ethic_fanatic_militarist
+					}
+				}
+				modifier = {
+					factor = 0.5
+					has_ethic = ethic_pacifist
+				}
+				modifier = {
+					factor = 0.25
+					has_ethic = ethic_fanatic_pacifist
+				}
+				cfc_join_early_cetana_war = yes
+			}
+		}
+	}
+}
+
+# Cetana's own reinforcements. Vanilla restored her to thirteen mobile fleets on
+# every crisis.8042 tick, which by itself made attrition unwinnable against her.
+# Each wave here restores less than the previous one and the chain stops after
+# the sixth, so a long war can genuinely be lost.
+country_event = {
+	id = cfc.50
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = synth_queen
+		cfc_is_initial_cetana_fe_phase = yes
+	}
+
+	immediate = {
+		if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 1 } }
+			cfc_queen_reinforce = { CAP = 13 }
+		}
+		else_if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 2 } }
+			cfc_queen_reinforce = { CAP = 11 }
+		}
+		else_if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 3 } }
+			cfc_queen_reinforce = { CAP = 9 }
+		}
+		else_if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 4 } }
+			cfc_queen_reinforce = { CAP = 7 }
+		}
+		else_if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 5 } }
+			cfc_queen_reinforce = { CAP = 5 }
+		}
+		else_if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 6 } }
+			cfc_queen_reinforce = { CAP = 3 }
+		}
+		if = {
+			limit = { check_variable = { which = cfc_reinforcement_wave value < 6 } }
+			change_variable = { which = cfc_reinforcement_wave value = 1 }
+			country_event = { id = cfc.50 days = 360 }
+		}
+		else_if = {
+			limit = { NOT = { has_country_flag = cfc_reinforcements_exhausted } }
+			set_country_flag = cfc_reinforcements_exhausted
+			log = "[Cetana Fair Crisis] Cetana reinforcement waves exhausted."
 		}
 	}
 }

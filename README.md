@@ -20,6 +20,14 @@ capital FE/AE y elimina las reglas que fuerzan prácticamente su victoria:
   alcanzar un FE/AE, pero no ejecutan allí el borrado de sistema.
 - Un imperio normal puede intervenir voluntariamente desde el contacto
   diplomático con Cetana, sin provocar una guerra automática para los demás.
+  Los imperios IA deciden por su cuenta, con una tirada anual ponderada por su
+  potencia de flota y su ética; el mod nunca alista a nadie.
+- Cetana conserva una vía de victoria convencional: un FE/AE sólo desaparece
+  tras seis meses seguidos de derrota militar confirmada (sin flota operativa y
+  con Cetana ocupando espacio dentro de sus fronteras). Es el borrado vanilla,
+  pero condicionado al resultado real de la guerra.
+- Sus refuerzos son decrecientes (13, 11, 9, 7, 5, 3 flotas y después ninguno),
+  de modo que una guerra larga de desgaste contra ella puede ganarse.
 - Si Cetana vence a todos los FE/AE, `crisis.8043` recupera el control y toda la
   cadena posterior continúa de forma vanilla.
 - Si el titán de Cetana es destruido prematuramente, el mod impide que arranque
@@ -92,7 +100,7 @@ Durante la fase anterior a `crisis.8043`:
 4. Intercepta en `crisis.8010/8015` sólo los sistemas FE/AE: añade el marcador
    visual de tormenta, pero no llama a `synth_queen_wipe_system`.
 5. Sustituye `crisis.8042`, que en vanilla destruye el 80 % de una flota FE y
-   después colonias. El reemplazo conserva el refuerzo vanilla `crisis.8050`,
+   después colonias. El reemplazo arranca la cadena de refuerzos `cfc.50`,
    sanea el estado y no se reprograma.
 6. Da protección contra la tormenta a FE/AE para que `crisis.8024` no expulse o
    destruya sus flotas antes del combate.
@@ -100,14 +108,27 @@ Durante la fase anterior a `crisis.8043`:
    de Cetana entre sus discursos (`crisis.8063`) ofrece **Intervenir contra
    Cetana**. Sólo quien lo elige entra en guerra y recibe las flags vanilla que
    permiten atravesar la tormenta y evitan que `crisis.8065` deshaga el combate.
-8. Detecta la destrucción temprana del titán mediante el mismo
-   `on_ship_destroyed_perp` que usa vanilla. El mod bloquea la transición tardía
-   y sanea el estado de la fase; **`crisis.23015` vanilla sigue siendo quien
-   ejecuta la derrota definitiva** (`end_crisis`, trackers de All Crises,
-   recompensas, flags y cadena `crisis.23005/23010`).
-9. Normaliza saves nuevos o cargados al inicio/carga y, como respaldo para
-   multijugador, en el pulso mensual. Sólo escribe logs cuando cambia una fase o
-   un país necesita normalización.
+   `cfc.40` da además a cada imperio IA una tirada anual propia para declararle
+   la guerra, ponderada por potencia relativa de flota y ética; nunca entra un
+   imperio cuya flota sea inferior a la de Cetana.
+8. Sustituye la eliminación de FE/AE por una condición militar. `cfc.30` evalúa
+   cada mes si un FE/AE está en guerra con Cetana, sin flota móvil operativa y
+   con Cetana ocupando espacio propio; tras seis meses seguidos aplica el borrado
+   vanilla. Si el FE reconstruye flota o Cetana se retira, la cuenta se reinicia.
+   El mismo evento vuelve a declarar la guerra `wg_end_threat` si una paz por
+   statu quo mantiene la fase congelada doce meses.
+9. Sustituye el refuerzo repetido `crisis.8050` por la cadena decreciente
+   `cfc.50`: hasta 13, 11, 9, 7, 5 y 3 flotas móviles en intervalos anuales, y
+   después ninguno. Nunca le quita flotas que ya tenga.
+10. Detecta la destrucción temprana del titán mediante el mismo
+    `on_ship_destroyed_perp` que usa vanilla. El mod bloquea la transición tardía
+    y sanea el estado de la fase; **`crisis.23015` vanilla sigue siendo quien
+    ejecuta la derrota definitiva** (`end_crisis`, trackers de All Crises,
+    recompensas, flags y cadena `crisis.23005/23010`), incluida la entrega de
+    `r_cetanas_heart` a quien destruya el titán.
+11. Normaliza saves nuevos o cargados al inicio/carga y, como respaldo para
+    multijugador, en el pulso mensual. Sólo escribe logs cuando cambia una fase o
+    un país necesita normalización.
 
 ## Qué no cambia
 
@@ -115,8 +136,11 @@ Durante la fase anterior a `crisis.8043`:
   `synth_queen_spawn`; sólo se prepara previamente un objetivo inicial seguro.
 - Potencia base, regeneración, velocidad, flotas, diseños o escalado de crisis.
 - Bonus de Cetana contra Contingencia, Prethoryn o extradimensionales.
-- Guerra automática: ningún imperio normal es añadido por el mod.
+- Guerra automática: ningún imperio normal es alistado por el mod; la
+  intervención es siempre una decisión del jugador o de la IA.
 - Transición vanilla `crisis.8043` si ya no quedan FE/AE.
+- El efecto de borrado `synth_queen_wipe_system`: se reutiliza tal cual, sólo
+  cambia cuándo se aplica.
 - Doomclock, situación, investigación, incursiones, guerra final y final normal.
 - Otras crisis, sus probabilidades o su escalado.
 - Comportamiento general de FE/AE fuera de la fase de Cetana.
@@ -184,14 +208,17 @@ Buscar `[Cetana Fair Crisis]` en `game.log`. Se registran:
 
 - detección de la fase FE/AE;
 - normalización de cada FE/AE una sola vez;
-- entrada voluntaria de un imperio;
+- entrada voluntaria de un imperio, sea jugador o IA;
+- derrota militar confirmada de un FE/AE y aplicación del borrado vanilla;
+- reapertura de una guerra congelada por paz de statu quo;
+- cada oleada de refuerzos de Cetana y su agotamiento;
 - destrucción temprana del titán;
 - confirmación de cleanup tras las flags vanilla;
 - retorno a la cadena vanilla si Cetana gana.
 
 ## Plan de pruebas reproducible
 
-El procedimiento T1–T11 completo está en
+El procedimiento T1–T15 completo está en
 [`docs/testing.md`](docs/testing.md). Para todos los casos, iniciar Stellaris con
 `-debug_mode`, activar `game.log` y guardar antes de `crisis.8005`.
 

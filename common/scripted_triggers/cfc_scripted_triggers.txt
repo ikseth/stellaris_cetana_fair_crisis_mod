@@ -15,3 +15,30 @@ cfc_is_initial_cetana_fe_phase = {
 		}
 	}
 }
+
+# A Fallen/Awakened Empire that has actually lost the war it is fighting against
+# Cetana: no operational navy left and Cetana holding space inside its borders.
+# This is the military replacement for vanilla's unconditional crisis.8042 grind.
+cfc_fallen_empire_is_militarily_broken = {
+	OR = {
+		is_country_type = fallen_empire
+		is_country_type = awakened_fallen_empire
+	}
+	exists = event_target:synth_queen_country_global
+	is_at_war_with = event_target:synth_queen_country_global
+	count_owned_fleet = {
+		count < 1
+		limit = {
+			is_mobile = yes
+			is_civilian = no
+			fleet_power > 5000
+		}
+	}
+	any_system_within_border = {
+		any_fleet_in_system = {
+			is_mobile = yes
+			exists = owner
+			owner = { is_country_type = synth_queen }
+		}
+	}
+}

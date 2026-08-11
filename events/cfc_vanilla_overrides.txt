@@ -123,8 +123,15 @@ country_event = {
 	}
 
 	immediate = {
+		# Vanilla called crisis.8050 here on every tick of an endless chain. The
+		# first CFC wave reproduces that same top-up, later ones give less.
 		event_target:synth_queen_country_global = {
-			country_event = { id = crisis.8050 }
+			if = {
+				limit = { NOT = { has_country_flag = cfc_reinforcement_chain_active } }
+				set_country_flag = cfc_reinforcement_chain_active
+				set_variable = { which = cfc_reinforcement_wave value = 0 }
+				country_event = { id = cfc.50 }
+			}
 		}
 		cfc_normalize_fallen_empire = yes
 		if = {
@@ -154,15 +161,7 @@ country_event = {
 		}
 		custom_tooltip = cfc.8063.intervene.tooltip
 		hidden_effect = {
-			set_country_flag = cfc_joined_early_cetana_war
-			set_country_flag = synth_queen_cannot_yeet_the_fleets
-			set_country_flag = protected_from_queen_storm
-			declare_war = {
-				target = event_target:synth_queen_country_global
-				name = cfc_cetana_intervention_war
-				attacker_war_goal = cfc_wg_intervene_cetana
-			}
-			log = "[Cetana Fair Crisis] [This.GetName] voluntarily declared war on Cetana during the FE phase."
+			cfc_join_early_cetana_war = yes
 		}
 	}
 

@@ -8,9 +8,16 @@ This document is the implementation contract for Stellaris **Pegasus 4.4.6
 > During Cetana's initial conflict with Fallen and Awakened Empires, military
 > combat alone decides whether Cetana reaches her normal Synthetic Queen phase.
 
+The invariant cuts both ways. Neutralizing vanilla's forced-victory scripting is
+only half of it: the phase must still be able to *end*, and it must be able to
+end either way. Cetana therefore keeps a conventional path to eliminating a
+Fallen Empire, gated on an actual military outcome, and her reinforcements
+diminish so that attrition against her is winnable.
+
 The mod does not rebalance Cetana globally. If she wins the fair initial war,
 vanilla resumes at `crisis.8043`. If her Titan is destroyed first, vanilla
-`crisis.23015` remains the authority that ends the crisis.
+`crisis.23015` remains the authority that ends the crisis and grants
+`r_cetanas_heart` to whoever destroyed it.
 
 ## Vanilla state machine
 
@@ -98,9 +105,12 @@ initial FE phase and remain untouched.
 | `queen_combat_modifier` | modify | Remove only the two FE/AE-specific damage entries. | Key-level static modifier override preserving all other entries. |
 | `beset_by_cetana` | modify | Remove only the anti-Cetana damage penalty. | Neutral key-level override plus removal of live instances. |
 | `crisis.8024` | preserve, bypass for FE/AE | It remains valid outside the fair war and for unprepared normal empires. | FE/AE receive `protected_from_queen_storm` before any expansion can affect them. |
-| `crisis.8042` | modify narrowly | Its recursive storm, fleet and colony branches force Cetana's victory. | Override retains only `crisis.8050`, state normalization and one-shot logging; it does not reschedule itself. |
-| `crisis.8065` | preserve, bypass volunteers | Normal empires must opt in, but their real battle must not be undone. | Voluntary participants get `synth_queen_cannot_yeet_the_fleets` and storm protection. |
-| `synth_queen_fe_war` | preserve | Supplies the real initial wars required by the design. | No override. |
+| `crisis.8042` | modify narrowly | Its recursive storm, fleet and colony branches force Cetana's victory. | Override starts the `cfc.50` reinforcement chain, normalizes state and logs once; it does not reschedule itself. |
+| `crisis.8050` | replace during this phase | Its unconditional repeat made attrition against Cetana impossible. | `cfc.50` reproduces the first top-up and then diminishes to nothing. |
+| `crisis.8065` | preserve, bypass volunteers | Normal empires must opt in, but their real battle must not be undone. | Voluntary participants, player or AI, get `synth_queen_cannot_yeet_the_fleets` and storm protection. |
+| `synth_queen_fe_war` | preserve, re-arm | Supplies the real initial wars required by the design. | No override. `cfc.30` re-declares the same `wg_end_threat` war if a status quo peace stalls the phase. |
+| FE/AE elimination | replace mechanism | Vanilla removed FE countries on a timer; Cetana has no armies to do it conventionally. | `cfc.30` applies the vanilla wipe only after six months of confirmed military collapse. |
+| normal-empire hostility | extend | Vanilla never lets another empire fight Cetana this early, and the AI never declares war on a crisis country by itself. | Player option in `crisis.8063`; `cfc.40` yearly AI roll weighted by relative fleet power and ethics. |
 | `crisis.8043` | preserve | Authoritative vanilla continuation after military FE/AE elimination. | Log the transition and stop intervening after speech 2. |
 | `crisis.23015` | preserve | Authoritative defeat, `end_crisis` and All Crises bookkeeping. | Early Titan detector blocks the 8043 race, performs initial-state cleanup, and lets vanilla 23015 execute. |
 
@@ -119,20 +129,75 @@ FIRST SPEECH + VANILLA FE/AE WARS
   | no FE/AE damage handicap
   | no Queen FE/AE-specific damage bonus
   | no scripted fleet/colony destruction
-  | optional player intervention only
+  | cfc.50 diminishing reinforcements: 13, 11, 9, 7, 5, 3, none
+  | cfc.40 yearly AI intervention roll / crisis.8063 player option
+  | cfc.30 per-FE monthly evaluation
+  |    +-- status quo peace held 12 months -> wg_end_threat redeclared
+  |    +-- FE militarily broken 6 months   -> vanilla system wipe on that FE
   |
   +---------------------------+
   |                           |
   | all FE/AE eliminated      | Cetana Titan destroyed
-  | through actual war        | by FE/AE or volunteer
+  | through actual war        | by FE/AE, AI empire or player
   v                           v
 crisis.8043 vanilla           CFC early-defeat guard
 Synthetic Queen chain         |
 CFC stops intervening         v
                               crisis.23015 vanilla
-                              end_crisis + All Crises state
+                              end_crisis + r_cetanas_heart to the killer
                               crisis.23005/23010 cleanup
 ```
+
+## Conventional victory condition
+
+Vanilla eliminated Fallen Empires only through `crisis.8042` step 3+, which
+destroyed one colony every 180 days until the country had none left. That is the
+mechanism the fair-war invariant forbids, and it is also the only vanilla path
+to the `crisis.8043` precondition (`NOT = { any_country = { FE or AE } }`).
+Cetana has no armies in `common/armies`, so she cannot take a colony by
+invasion; leaving the gap open would let the crisis stall in the FE phase
+forever.
+
+`cfc_fallen_empire_is_militarily_broken` therefore expresses the same outcome as
+a war result instead of a timer. All four conditions must hold simultaneously:
+
+| Condition | Meaning |
+|---|---|
+| country type is `fallen_empire` or `awakened_fallen_empire` | scope guard |
+| `is_at_war_with` Cetana | the removal can only follow from a live war |
+| no owned mobile, non-civilian fleet above 5000 fleet power | its navy is gone |
+| a Cetana mobile fleet inside `any_system_within_border` | she holds its space |
+
+`cfc.30` increments `cfc_collapse_months` per monthly pulse while all of them
+hold and resets it to zero the moment any of them stops. At six the vanilla
+`synth_queen_wipe_system` runs over that country's systems, exactly the endpoint
+vanilla reached, and the engine removes the colony-less country. A rebuilt FE
+fleet or a Cetana withdrawal resets the counter and cancels the collapse.
+
+The same event carries the deadlock guard. `wg_end_threat` forbids surrender but
+permits status quo, so an AI Fallen Empire can now leave the war — impossible in
+vanilla, where the grind continued regardless. Twelve consecutive months at
+peace re-declare the vanilla war.
+
+## Reinforcement schedule
+
+`crisis.8050` restored Cetana to thirteen mobile fleets and was called from
+every tick of the endless `crisis.8042` chain. Retaining that call once, as
+version 1.1.0 did, is not neutral either: the Fallen Empires rebuild and Cetana
+would not. `cfc.50` replaces it with a decreasing yearly ladder.
+
+| Wave | Day | Restored up to |
+|---|---|---|
+| 1 | first `crisis.8042` tick | 13 mobile fleets |
+| 2 | +360 | 11 |
+| 3 | +720 | 9 |
+| 4 | +1080 | 7 |
+| 5 | +1440 | 5 |
+| 6 | +1800 | 3 |
+| — | after that | nothing |
+
+Each wave only tops up; it never removes fleets she already has. The chain stops
+by itself when the FE phase ends, because the event's trigger requires it.
 
 ## Save migration and idempotence
 
@@ -145,6 +210,8 @@ CFC stops intervening         v
 | `synth_queen_speech_2_happened` and no early-defeat guard | Log vanilla continuation once, remove the CFC active marker, and do not roll back the crisis. |
 | Titan destroyed during the initial phase | Set an idempotent pending flag, block `crisis.8043`, clean only CFC/initial FE state, and wait for vanilla `synth_queen_defeated`. |
 | `synth_queen_defeated` already set | Complete residual CFC cleanup once; never call the defeat event twice. |
+| Any state with live Fallen Empires | `cfc_collapse_months` and `cfc_peace_months` are created once per country by the normalizer, before `cfc.30` can read them. A 25-day flag keeps repeated loads from advancing either counter faster than one step per month. |
+| `crisis.8042` already consumed in an older save | The reinforcement chain is keyed on `cfc_reinforcement_chain_active`, so a save that already ran the 1.1.0 override simply gets no further waves. |
 
 All persistent mod flags use the `cfc_` prefix. Repeated load and monthly events
 are guards/normalizers: they do not create Cetana, declare FE wars, restart

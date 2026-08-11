@@ -102,6 +102,14 @@ cfc_restore_spawn_markers = {
 }
 
 cfc_normalize_fallen_empire = {
+	# Both counters are read by cfc.30 every month, so they are initialized here,
+	# before that event can ever run for this country.
+	if = {
+		limit = { NOT = { has_country_flag = cfc_fe_counters_ready } }
+		set_country_flag = cfc_fe_counters_ready
+		set_variable = { which = cfc_collapse_months value = 0 }
+		set_variable = { which = cfc_peace_months value = 0 }
+	}
 	if = {
 		limit = { has_modifier = beset_by_cetana }
 		remove_modifier = beset_by_cetana
@@ -124,6 +132,47 @@ cfc_normalize_fallen_empire = {
 	}
 }
 
+# Shared by the player option in crisis.8063 and by the AI decision in cfc.40 so
+# both routes grant exactly the same vanilla bypass flags and war.
+cfc_join_early_cetana_war = {
+	set_country_flag = cfc_joined_early_cetana_war
+	set_country_flag = synth_queen_cannot_yeet_the_fleets
+	set_country_flag = protected_from_queen_storm
+	declare_war = {
+		target = event_target:synth_queen_country_global
+		name = cfc_cetana_intervention_war
+		attacker_war_goal = cfc_wg_intervene_cetana
+	}
+	log = "[Cetana Fair Crisis] [This.GetName] declared war on Cetana during the FE phase."
+}
+
+# Cetana's conventional victory over one Fallen/Awakened Empire. It is only ever
+# called after cfc_fallen_empire_is_militarily_broken has held for six
+# consecutive months, so the outcome is produced by the war, not by a timer.
+# The vanilla wipe effect is reused unchanged for the actual removal.
+cfc_collapse_fallen_empire = {
+	log = "[Cetana Fair Crisis] [This.GetName] lost the war against Cetana; vanilla system wipe applied."
+	every_system_within_border = {
+		synth_queen_wipe_system = yes
+	}
+}
+
+# Diminishing replacement for the repeated vanilla crisis.8050 top-up. $CAP$ is
+# the maximum number of mobile fleets this wave restores.
+cfc_queen_reinforce = {
+	while = {
+		count = 15
+		limit = {
+			count_owned_fleet = {
+				count < $CAP$
+				limit = { is_mobile = yes }
+			}
+		}
+		synth_queen_create_war_fleet = yes
+	}
+	log = "[Cetana Fair Crisis] Cetana reinforcement wave capped at $CAP$ fleets."
+}
+
 cfc_cleanup_early_phase = {
 	every_country = {
 		limit = {
@@ -144,6 +193,13 @@ cfc_cleanup_early_phase = {
 		remove_country_flag = weaker_navy
 		remove_country_flag = protected_from_queen_storm
 		remove_country_flag = cfc_fe_normalized
+		if = {
+			limit = { has_country_flag = cfc_fe_counters_ready }
+			remove_country_flag = cfc_fe_counters_ready
+			remove_country_flag = cfc_fe_tick_recent
+			set_variable = { which = cfc_collapse_months value = 0 }
+			set_variable = { which = cfc_peace_months value = 0 }
+		}
 		every_system_within_border = {
 			if = {
 				limit = { has_modifier = queen_small_scorn_storm }
@@ -164,5 +220,14 @@ cfc_cleanup_early_phase = {
 		remove_country_flag = cfc_joined_early_cetana_war
 		remove_country_flag = synth_queen_cannot_yeet_the_fleets
 		remove_country_flag = protected_from_queen_storm
+	}
+	every_country = {
+		limit = { has_country_flag = cfc_intervention_cooldown }
+		remove_country_flag = cfc_intervention_cooldown
+	}
+	every_country = {
+		limit = { has_country_flag = cfc_reinforcement_chain_active }
+		remove_country_flag = cfc_reinforcement_chain_active
+		set_variable = { which = cfc_reinforcement_wave value = 0 }
 	}
 }

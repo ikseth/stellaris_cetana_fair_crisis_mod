@@ -1,6 +1,6 @@
 ﻿l_english:
  cfc.8063.intervene: "Intervene against Cetana"
- cfc.8063.intervene.tooltip: "We will voluntarily join the struggle against Cetana. Other normal empires will not be drawn into the war."
+ cfc.8063.intervene.tooltip: "We will voluntarily join the struggle against Cetana. No other empire is dragged into our war; each one decides for itself."
  war_goal_cfc_wg_intervene_cetana: "Intervene Against Cetana"
  war_goal_cfc_wg_intervene_cetana_desc: "A total war to destroy Cetana before she completes her revenge against the Fallen Empires."
  cfc_cetana_intervention_war: "Early War Against Cetana"

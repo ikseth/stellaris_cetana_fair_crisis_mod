@@ -7,6 +7,43 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-11
+
+### Added
+
+- Conventional victory condition for Cetana. A Fallen/Awakened Empire is only
+  removed after `cfc_fallen_empire_is_militarily_broken` has held for six
+  consecutive months: it is at war with Cetana, has no operational mobile
+  warfleet left, and Cetana holds space inside its borders. The vanilla system
+  wipe is then reused for the removal, so `crisis.8043` and the normal Synthetic
+  Queen chain remain reachable without any scripted head start.
+- Independent AI intervention. Each AI empire rolls at most once per year during
+  the Fallen Empire phase and may declare war on Cetana on its own, weighted by
+  relative fleet power and ethics. No empire is ever enlisted by script.
+- Deadlock guard. If a Fallen Empire leaves the war through a status quo peace
+  and stays at peace for twelve months, the vanilla `wg_end_threat` war is
+  declared again. Vanilla could never reach this state because its colony grind
+  never stopped.
+
+### Changed
+
+- Cetana's reinforcements now diminish. Vanilla restored her to thirteen mobile
+  fleets on every `crisis.8042` tick; the replacement chain restores 13, 11, 9,
+  7, 5 and 3 fleets at yearly intervals and then stops, so a long war of
+  attrition against her can be won.
+- The player option in `crisis.8063` and the new AI decision share a single
+  effect, so both grant exactly the same vanilla bypass flags.
+
+### Fixed
+
+- Cetana could no longer win the Fallen Empire phase at all. Removing the
+  destructive `crisis.8042` branches also removed the only vanilla path to
+  eliminating a Fallen Empire country, and `crisis.8043` requires that none
+  exist. Without the new conquest condition the crisis could stall in that phase
+  indefinitely.
+
+## [1.1.0] - 2026-08-10
+
 ### Added
 
 - Formal vanilla and Fair Crisis state machines, forced-victory inventory,
@@ -77,7 +114,9 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Diagnostic logging with the `[Cetana Fair Crisis]` prefix.
 - Technical vanilla analysis and reproducible test plan.
 
-[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.0...v1.0.1

@@ -143,3 +143,57 @@ The correction must start at `crisis.8005`, intercept FE/AE system wipes in
 `crisis.8050` call in the `8042` override. No global override of
 `synth_queen_wipe_system` is justified because later Cetana content legitimately
 uses related wipe effects.
+
+## Second review: gaps introduced by the correction itself
+
+The 1.1.0 correction removed every forced-victory mechanism and stopped there.
+Reading `crisis.8043` against what was left shows three problems that only
+appear once the scripting is gone.
+
+### 8. Cetana could no longer win the phase at all
+
+`crisis.8043` fires only when `NOT = { any_country = { fallen_empire or
+awakened_fallen_empire } }`. In vanilla, the sole mechanism that reaches that
+state is `crisis.8042` step 3+, destroying one FE colony every 180 days. That is
+precisely what the mod removed. Cetana has no entry in `common/armies`, so she
+cannot invade; her only conventional route to a colony is armageddon bombardment
+(`is_crisis_faction = yes` satisfies the stance trigger), which the AI may never
+carry through against every FE world. The likely outcome was an FE phase that
+never ends in either direction.
+
+Resolved in 1.2.0 by `cfc.30`: the vanilla wipe is applied to one Fallen Empire
+only after `cfc_fallen_empire_is_militarily_broken` has held for six consecutive
+months. The removal is unchanged vanilla; its precondition is now a war result.
+
+### 9. The war of attrition was one-sided against the Fallen Empires
+
+`crisis.8050` restores Cetana to thirteen mobile fleets and vanilla called it on
+every tick of the endless `crisis.8042` chain. The 1.1.0 override kept exactly
+one call, which is neither the vanilla behaviour nor a neutral one: Fallen
+Empires rebuild ships and Cetana would not, so the phase drifted towards her
+defeat by default. `cfc.50` replaces it with 13, 11, 9, 7, 5, 3 and then
+nothing, at yearly intervals.
+
+### 10. `wg_end_threat` permits status quo, and vanilla never noticed
+
+`forbidden_peace_offers` in `wg_end_threat` blocks surrender and demanded
+surrender but not `status_quo`. Vanilla was immune to the consequence because
+its colony grind ran regardless of the war state. With the grind removed, an AI
+Fallen Empire that peaces out freezes the crisis permanently. `cfc.30` now
+re-declares the vanilla war after twelve months at peace.
+
+### 11. Other empires could not join before the crisis proper
+
+Only a human player could act, through the `crisis.8063` option, and only after
+speech 1 — `synth_queen_storm` sets `show_in_contacts_list = no` and
+`can_talk_to_the_synth_queen` is granted by `crisis.8040/8041`. AI empires had
+no route at all: `cfc_wg_intervene_cetana` carries `ai_weight = 0` and the AI
+does not declare war on crisis countries on its own. `cfc.40` gives every AI
+empire one weighted roll per year during the phase.
+
+### Confirmed as already correct
+
+`crisis.23015` grants `r_cetanas_heart` with `add_relic` in root scope, and
+`on_ship_destroyed_perp` binds root to the country that destroyed the ship. The
+relic therefore already goes to whoever kills the Titan, Fallen Empire or normal
+empire, without any mod intervention.

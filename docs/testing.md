@@ -13,7 +13,7 @@
 
 ### Mandatory preflight
 
-1. In the launcher's selected playset, verify that **Cetana Fair Crisis 1.1.0**
+1. In the launcher's selected playset, verify that **Cetana Fair Crisis 1.2.0**
    is enabled, not merely present in the library.
 2. After launch, verify that `dlc_load.json` lists
    `mod/cetana_fair_crisis.mod` under `enabled_mods`.
@@ -81,9 +81,48 @@ invoke a second victory or directly kill the Queen country.
 
 Do not intervene and let actual wars remove every FE/AE.
 
-Expected: one vanilla-continuation log, then normal `crisis.8043`, speech 2,
+Expected: for each FE, six monthly steps of confirmed military collapse, then
+the `lost the war against Cetana` log and its colonies destroyed. After the last
+one, a single vanilla-continuation log, then normal `crisis.8043`, speech 2,
 doomclock and player-facing Synthetic Queen situation. No CFC mechanics alter
 the later crisis.
+
+## T12 — collapse condition is reversible
+
+1. Let an FE lose its whole navy while Cetana holds one of its systems.
+2. Before the sixth month, console-spawn an FE warfleet or pull Cetana's fleets
+   out of FE space.
+
+Expected: no collapse log and no colony destroyed. `cfc_collapse_months` returns
+to zero and the countdown restarts only when all four conditions hold again.
+This is the test that distinguishes a war outcome from a timer.
+
+## T13 — AI empires intervene on their own
+
+Observe at least three in-game years of the FE phase with several strong AI
+empires present.
+
+Expected: occasional `declared war on Cetana during the FE phase` logs, at most
+one roll per empire per year, and no roll at all from an empire whose fleet
+power is below Cetana's. No AI empire is ever enlisted automatically, and none
+of them is dragged in by the player's own intervention.
+
+## T14 — reinforcements diminish
+
+Record Cetana's mobile fleet count right after each `reinforcement wave capped
+at N fleets` log.
+
+Expected: caps of 13, 11, 9, 7, 5 and 3 at roughly yearly intervals, then
+`reinforcement waves exhausted` and no further replacement. A wave never removes
+fleets she already has.
+
+## T15 — status quo peace does not freeze the crisis
+
+Force or wait for a status quo peace between an FE and Cetana.
+
+Expected: after twelve months at peace, one `Reopened the stalled Cetana war`
+log and a fresh `wg_end_threat` war. The counter resets whenever the war is
+active, so an ordinary war produces no such log.
 
 ## T9 — All Crises
 

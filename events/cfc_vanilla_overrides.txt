@@ -26,9 +26,8 @@ country_event = {
 		cfc_restore_spawn_markers = yes
 		if = {
 			limit = { any_country = { is_country_type = synth_queen_storm } }
-			# cfc.1 is a scopeless event, so it must not be fired as a country
-			# event; doing so silently skipped the detection at spawn time.
-			event = { id = cfc.1 }
+			# cfc.1 is picked up by the next monthly pulse. There is no valid
+			# generic `event` effect in this country scope.
 			country_event = { id = crisis.8010 days = 360 }
 			every_playable_country = {
 				limit = { is_ai = no }
@@ -111,7 +110,7 @@ country_event = {
 }
 
 # Vanilla crisis.8042 directly destroys FE fleets and colonies and reschedules
-# itself forever. Keep its Queen fleet top-up, normalize the FE, and stop there.
+# itself forever. Normalize the FE and stop there; no Queen fleet is recreated.
 country_event = {
 	id = crisis.8042
 	hide_window = yes
@@ -125,14 +124,15 @@ country_event = {
 	}
 
 	immediate = {
-		# Vanilla called crisis.8050 here on every tick of an endless chain. The
-		# first CFC wave reproduces that same top-up, later ones give less.
+		# Vanilla called crisis.8050 here on every tick of an endless chain.
+		# Attrition must be permanent in the fair phase, so even the first top-up
+		# is disabled.
 		event_target:synth_queen_country_global = {
 			if = {
-				limit = { NOT = { has_country_flag = cfc_reinforcement_chain_active } }
-				set_country_flag = cfc_reinforcement_chain_active
-				set_variable = { which = cfc_reinforcement_wave value = 0 }
-				country_event = { id = cfc.50 }
+				limit = { NOT = { has_country_flag = cfc_reinforcements_exhausted } }
+				set_country_flag = cfc_reinforcements_exhausted
+				set_variable = { which = cfc_reinforcement_wave value = 6 }
+				log = "[Cetana Fair Crisis] Cetana reinforcements disabled."
 			}
 		}
 		cfc_normalize_fallen_empire = yes

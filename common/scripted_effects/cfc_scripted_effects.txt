@@ -115,6 +115,10 @@ cfc_normalize_fallen_empire = {
 		remove_modifier = beset_by_cetana
 	}
 	if = {
+		limit = { NOT = { has_modifier = cfc_cetana_crisis_participant } }
+		add_modifier = { modifier = cfc_cetana_crisis_participant days = -1 }
+	}
+	if = {
 		limit = { has_country_flag = synth_queen_storm }
 		deactivate_fog_machine = yes
 		remove_country_flag = synth_queen_storm
@@ -157,24 +161,6 @@ cfc_collapse_fallen_empire = {
 	}
 }
 
-# Diminishing replacement for the repeated vanilla crisis.8050 top-up. $CAP$ is
-# the maximum number of mobile fleets this wave restores.
-cfc_queen_reinforce = {
-	while = {
-		count = 15
-		limit = {
-			count_owned_fleet = {
-				count < $CAP$
-				limit = { is_mobile = yes }
-			}
-		}
-		synth_queen_create_war_fleet = yes
-	}
-	# The cap is deliberately absent from this string: the macro preprocessor
-	# also scans quoted text, and a $CAP$ here is reported as an invalid macro.
-	log = "[Cetana Fair Crisis] Cetana reinforcement wave applied."
-}
-
 cfc_cleanup_early_phase = {
 	every_country = {
 		limit = {
@@ -186,6 +172,10 @@ cfc_cleanup_early_phase = {
 		if = {
 			limit = { has_modifier = beset_by_cetana }
 			remove_modifier = beset_by_cetana
+		}
+		if = {
+			limit = { has_modifier = cfc_cetana_crisis_participant }
+			remove_modifier = cfc_cetana_crisis_participant
 		}
 		if = {
 			limit = { has_country_flag = synth_queen_storm }

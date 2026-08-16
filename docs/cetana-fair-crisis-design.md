@@ -11,10 +11,10 @@ This document is the implementation contract for Stellaris **Pegasus 4.4.6
 The invariant cuts both ways. Neutralizing vanilla's forced-victory scripting is
 only half of it: the phase must still be able to *end*, and it must be able to
 end either way. Cetana therefore keeps a conventional path to eliminating a
-Fallen Empire, gated on an actual military outcome, and her reinforcements
-diminish so that attrition against her is winnable.
+Fallen Empire, gated on an actual military outcome. Her initial fleets are
+finite and her Titan remains boss-scale without being a practical invulnerability.
 
-The mod does not rebalance Cetana globally. If she wins the fair initial war,
+The mod narrowly rebalances Cetana's Titan. If she wins the fair initial war,
 vanilla resumes at `crisis.8043`. If her Titan is destroyed first, vanilla
 `crisis.23015` remains the authority that ends the crisis and grants
 `r_cetanas_heart` to whoever destroyed it.
@@ -87,10 +87,10 @@ granted its bypass flag.
 | DAMAGE MODIFIER | `beset_by_cetana` | Gives its FE/AE owner `-90%` damage against the `synth_queen` country type. |
 | FLEET DESTRUCTION | `crisis.8042`, step 2 | Destroys 80% of the ships in a randomly selected mobile FE/AE fleet. |
 | PLANET EFFECT / COUNTRY DESTRUCTION | `crisis.8042`, step 3+ | Repeatedly destroys non-capital colonies; devastates capitals and kills population groups. |
-| OTHER | `crisis.8042` -> `crisis.8050` | Tops Cetana up to 13 mobile fleets. This is vanilla force composition, not direct removal of an opponent, and is retained. |
+| REINFORCEMENT | `crisis.8042` -> `crisis.8050` | Repeatedly tops Cetana up to 13 mobile fleets, making combat losses non-persistent. |
 | DIPLOMATIC RESTRICTION / FLEET DAMAGE | `crisis.8065` | Damages/destroys an attacking default empire's fleet and sends it MIA unless it has the vanilla bypass flag. |
 | WAR SCRIPTING | `synth_queen_fe_war` | Starts real FE/AE wars against Cetana. This is required and retained; it does not enlist normal empires. |
-| INVULNERABILITY | none in `synth_queen_titan` or the main Queen country types | The Titan has enormous vanilla statistics and `never_mia`, but no scripted invulnerability. Its destruction is a valid vanilla defeat trigger. |
+| PRACTICAL INVULNERABILITY | `synth_queen_titan` | No literal invulnerability flag exists, but 1.75M hull, 1.25M armor, 500k shields, +200% damage, +300% fire rate and regeneration produced a 7.36M Titan in the inspected 1x save. |
 
 The later `synth_queen_mini_wipe_system` and game-over events are outside the
 initial FE phase and remain untouched.
@@ -102,15 +102,17 @@ initial FE phase and remain untouched.
 | `crisis.8005` + `synth_queen_spawn` | modify narrowly | Preserve the full spawn but prevent its preferential FE-capital sacrifice. | Small event override prepares a safe, uncolonized bastille candidate, creates a minimal isolated fallback system only if necessary, calls the original effect, then starts Fair Crisis normalization. |
 | `crisis.8010` / `crisis.8015` | modify narrowly | Their call to the global wipe effect destroys FE/AE colonies and fleets. | Small event overrides retain timers and normal expansion; FE/AE systems receive only the visual storm marker. |
 | `synth_queen_wipe_system` | preserve | Used by later vanilla content and safe initial targets; a global override would be broad and incompatible. | Calls are intercepted only at initial-phase callers. |
-| `queen_combat_modifier` | modify | Remove only the two FE/AE-specific damage entries. | Key-level static modifier override preserving all other entries. |
+| `queen_combat_modifier` | modify | Remove the two FE/AE-specific damage entries and prevent 10% hull regeneration from erasing combat progress. | Key-level static modifier override with 1% hull regeneration; other entries remain. |
 | `beset_by_cetana` | modify | Remove only the anti-Cetana damage penalty. | Neutral key-level override plus removal of live instances. |
+| `synth_queen_titan` | modify | Its vanilla concentration of offense and defense makes the newly enabled early war practically unwinnable. | Preserve the complete boss ship definition while reducing only hull, armor, shields, damage, fire rate and shield regeneration. |
 | `crisis.8024` | preserve, bypass for FE/AE | It remains valid outside the fair war and for unprepared normal empires. | FE/AE receive `protected_from_queen_storm` before any expansion can affect them. |
-| `crisis.8042` | modify narrowly | Its recursive storm, fleet and colony branches force Cetana's victory. | Override starts the `cfc.50` reinforcement chain, normalizes state and logs once; it does not reschedule itself. |
-| `crisis.8050` | replace during this phase | Its unconditional repeat made attrition against Cetana impossible. | `cfc.50` reproduces the first top-up and then diminishes to nothing. |
+| `crisis.8042` | modify narrowly | Its recursive storm, fleet, colony and reinforcement branches force Cetana's victory. | Override normalizes state, marks reinforcements exhausted and does not reschedule itself. |
+| `crisis.8050` / `cfc.50` | disable during this phase | Any top-up devalues a military victory against already powerful initial fleets. | No new event is scheduled; legacy `cfc.50` events remain valid but create nothing. |
 | `crisis.8065` | preserve, bypass volunteers | Normal empires must opt in, but their real battle must not be undone. | Voluntary participants, player or AI, get `synth_queen_cannot_yeet_the_fleets` and storm protection. |
 | `synth_queen_fe_war` | preserve, re-arm | Supplies the real initial wars required by the design. | No override. `cfc.30` re-declares the same `wg_end_threat` war if a status quo peace stalls the phase. |
 | FE/AE elimination | replace mechanism | Vanilla removed FE countries on a timer; Cetana has no armies to do it conventionally. | `cfc.30` applies the vanilla wipe only after six months of confirmed military collapse. |
 | normal-empire hostility | extend | Vanilla never lets another empire fight Cetana this early, and the AI never declares war on a crisis country by itself. | Player option in `crisis.8063`; `cfc.40` yearly AI roll weighted by relative fleet power and ethics. |
+| participant war exhaustion | suppress | An existential crisis war must not punish the defender like an ordinary territorial war. | The intervention war goal has `war_exhaustion = 0`; FE/AE countries using vanilla `wg_end_threat` receive a phase-scoped modifier. |
 | `crisis.8043` | preserve | Authoritative vanilla continuation after military FE/AE elimination. | Log the transition and stop intervening after speech 2. |
 | `crisis.23015` | preserve | Authoritative defeat, `end_crisis` and All Crises bookkeeping. | Early Titan detector blocks the 8043 race, performs initial-state cleanup, and lets vanilla 23015 execute. |
 
@@ -129,7 +131,8 @@ FIRST SPEECH + VANILLA FE/AE WARS
   | no FE/AE damage handicap
   | no Queen FE/AE-specific damage bonus
   | no scripted fleet/colony destruction
-  | cfc.50 diminishing reinforcements: 13, 11, 9, 7, 5, 3, none
+  | finite initial Queen fleets; no replacements
+  | balanced boss Titan; no participant war exhaustion
   | cfc.40 yearly AI intervention roll / crisis.8063 player option
   | cfc.30 per-FE monthly evaluation
   |    +-- status quo peace held 12 months -> wg_end_threat redeclared
@@ -179,25 +182,13 @@ permits status quo, so an AI Fallen Empire can now leave the war — impossible 
 vanilla, where the grind continued regardless. Twelve consecutive months at
 peace re-declare the vanilla war.
 
-## Reinforcement schedule
+## Reinforcements
 
-`crisis.8050` restored Cetana to thirteen mobile fleets and was called from
-every tick of the endless `crisis.8042` chain. Retaining that call once, as
-version 1.1.0 did, is not neutral either: the Fallen Empires rebuild and Cetana
-would not. `cfc.50` replaces it with a decreasing yearly ladder.
-
-| Wave | Day | Restored up to |
-|---|---|---|
-| 1 | first `crisis.8042` tick | 13 mobile fleets |
-| 2 | +360 | 11 |
-| 3 | +720 | 9 |
-| 4 | +1080 | 7 |
-| 5 | +1440 | 5 |
-| 6 | +1800 | 3 |
-| — | after that | nothing |
-
-Each wave only tops up; it never removes fleets she already has. The chain stops
-by itself when the FE phase ends, because the event's trigger requires it.
+`crisis.8050` restored Cetana to thirteen mobile fleets from every tick of the
+endless `crisis.8042` chain. Fair Crisis now disables that call completely.
+Cetana keeps every initial fleet, but destroyed fleets stay destroyed. `cfc.50`
+remains defined only so an event already serialized by an older version can
+terminate harmlessly.
 
 ## Save migration and idempotence
 
@@ -211,7 +202,7 @@ by itself when the FE phase ends, because the event's trigger requires it.
 | Titan destroyed during the initial phase | Set an idempotent pending flag, block `crisis.8043`, clean only CFC/initial FE state, and wait for vanilla `synth_queen_defeated`. |
 | `synth_queen_defeated` already set | Complete residual CFC cleanup once; never call the defeat event twice. |
 | Any state with live Fallen Empires | `cfc_collapse_months` and `cfc_peace_months` are created once per country by the normalizer, before `cfc.30` can read them. A 25-day flag keeps repeated loads from advancing either counter faster than one step per month. |
-| `crisis.8042` already consumed in an older save | The reinforcement chain is keyed on `cfc_reinforcement_chain_active`, so a save that already ran the 1.1.0 override simply gets no further waves. |
+| `crisis.8042` or `cfc.50` already queued in an older save | Mark reinforcements exhausted; create no ships and schedule no further wave. |
 
 All persistent mod flags use the `cfc_` prefix. Repeated load and monthly events
 are guards/normalizers: they do not create Cetana, declare FE wars, restart

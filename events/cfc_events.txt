@@ -263,10 +263,8 @@ country_event = {
 	}
 }
 
-# Cetana's own reinforcements. Vanilla restored her to thirteen mobile fleets on
-# every crisis.8042 tick, which by itself made attrition unwinnable against her.
-# Each wave here restores less than the previous one and the chain stops after
-# the sixth, so a long war can genuinely be lost.
+# Compatibility target for reinforcement events already queued in an older
+# save. New waves are no longer scheduled and a queued wave creates no ships.
 country_event = {
 	id = cfc.50
 	hide_window = yes
@@ -278,39 +276,11 @@ country_event = {
 	}
 
 	immediate = {
+		set_variable = { which = cfc_reinforcement_wave value = 6 }
 		if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 1 } }
-			cfc_queen_reinforce = { CAP = 13 }
-		}
-		else_if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 2 } }
-			cfc_queen_reinforce = { CAP = 11 }
-		}
-		else_if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 3 } }
-			cfc_queen_reinforce = { CAP = 9 }
-		}
-		else_if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 4 } }
-			cfc_queen_reinforce = { CAP = 7 }
-		}
-		else_if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 5 } }
-			cfc_queen_reinforce = { CAP = 5 }
-		}
-		else_if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 6 } }
-			cfc_queen_reinforce = { CAP = 3 }
-		}
-		if = {
-			limit = { check_variable = { which = cfc_reinforcement_wave value < 6 } }
-			change_variable = { which = cfc_reinforcement_wave value = 1 }
-			country_event = { id = cfc.50 days = 360 }
-		}
-		else_if = {
 			limit = { NOT = { has_country_flag = cfc_reinforcements_exhausted } }
 			set_country_flag = cfc_reinforcements_exhausted
-			log = "[Cetana Fair Crisis] Cetana reinforcement waves exhausted."
+			log = "[Cetana Fair Crisis] Cetana reinforcements disabled."
 		}
 	}
 }

@@ -103,6 +103,15 @@ done < <(sed -nE 's/^[[:space:]]*(country_)?event[[:space:]]*=[[:space:]]*\{[[:s
 	| sed -E 's/^country_/country /; s/^cfc/scopeless cfc/')
 note "CFC event fire scopes match their declarations"
 
+# `event = { id = ... }` is not a valid effect in country scope even when the
+# target itself is declared as a scopeless event. Let an on_action fire it.
+if search_recursive '^[[:space:]]*event[[:space:]]*=[[:space:]]*\{[[:space:]]*id[[:space:]]*=' \
+	"$repo_root/common" "$repo_root/events"; then
+	fail "invalid generic event firing effect"
+else
+	note "no invalid generic event firing effects"
+fi
+
 actual_overrides=$(sed -nE 's/^[[:space:]]*id[[:space:]]*=[[:space:]]*(crisis\.[0-9]+).*/\1/p' \
 	"$repo_root/events/cfc_vanilla_overrides.txt" | sort | tr '\n' ' ')
 expected_overrides='crisis.8005 crisis.8010 crisis.8015 crisis.8042 crisis.8063 '
@@ -116,7 +125,42 @@ if search_recursive '(^|[[:space:]])(destroy_country|kill_country|destroy_colony
 	"$repo_root/common" "$repo_root/events"; then
 	fail "destructive fleet/country/colony effect present in mod scripts"
 else
-	note "no direct destructive fleet/country/colony effects"
+note "no direct destructive fleet/country/colony effects"
+
+if search_recursive 'synth_queen_create_war_fleet[[:space:]]*=' \
+	"$repo_root/common" "$repo_root/events"; then
+	fail "Cetana reinforcement creation is still reachable"
+else
+	note "Cetana reinforcement creation is disabled"
+fi
+
+if ! search_quiet '^[[:space:]]*war_exhaustion[[:space:]]*=[[:space:]]*0$' \
+	"$repo_root/common/war_goals/cfc_cetana_war_goal.txt"; then
+	fail "Cetana intervention war still generates war exhaustion"
+else
+	note "Cetana intervention war exhaustion is disabled"
+fi
+
+for expected_titan_value in \
+	'max_hitpoints = 1000000' \
+	'ship_armor_add = 650000' \
+	'ship_shield_add = 300000' \
+	'ship_weapon_damage = 0.5' \
+	'ship_fire_rate_mult = 1' \
+	'ship_shield_regen_add_perc = 0.02'; do
+	if ! search_quiet "^[[:space:]]*$expected_titan_value$" \
+		"$repo_root/common/ship_sizes/cfc_synth_queen_titan.txt"; then
+		fail "missing Titan balance value: $expected_titan_value"
+	fi
+done
+note "Cetana Titan balance values checked"
+
+if ! search_quiet '^[[:space:]]*ship_hull_regen_add_perc[[:space:]]*=[[:space:]]*0\.01$' \
+	"$repo_root/common/static_modifiers/cfc_queen_combat_modifiers.txt"; then
+	fail "Cetana global hull regeneration is not balanced"
+else
+	note "Cetana global hull regeneration checked"
+fi
 fi
 
 while IFS= read -r localization; do

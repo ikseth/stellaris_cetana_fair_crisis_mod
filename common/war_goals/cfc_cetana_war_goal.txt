@@ -2,6 +2,7 @@ cfc_wg_intervene_cetana = {
 	casus_belli = cb_containment
 	hide = no_cb
 	total_war = yes
+	war_exhaustion = 0
 
 	forbidden_peace_offers = {
 		demand_surrender = ""

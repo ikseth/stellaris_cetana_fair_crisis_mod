@@ -1,8 +1,8 @@
 # Cetana Fair Crisis
 
 Mini-mod para Stellaris que convierte la guerra inicial de Cetana contra los
-Imperios Caídos/Despertados en un enfrentamiento real, sin reducir su potencia
-general ni alterar la cadena vanilla cuando Cetana vence.
+Imperios Caídos/Despertados en un enfrentamiento real y ganable, sin alterar la
+cadena vanilla cuando Cetana vence.
 
 ## Resumen ejecutivo
 
@@ -26,8 +26,14 @@ capital FE/AE y elimina las reglas que fuerzan prácticamente su victoria:
   tras seis meses seguidos de derrota militar confirmada (sin flota operativa y
   con Cetana ocupando espacio dentro de sus fronteras). Es el borrado vanilla,
   pero condicionado al resultado real de la guerra.
-- Sus refuerzos son decrecientes (13, 11, 9, 7, 5, 3 flotas y después ninguno),
-  de modo que una guerra larga de desgaste contra ella puede ganarse.
+- Su titán conserva el perfil de jefe final, pero reduce sus capas defensivas,
+  daño, cadencia y regeneración desde los valores vanilla desproporcionados.
+- La regeneración global de casco de las naves de Cetana baja del 10 % al 1 %;
+  sus módulos de autorreparación siguen funcionando.
+- No recibe refuerzos durante la fase inicial: cada flota destruida es una baja
+  permanente.
+- Los participantes voluntarios no generan hastío bélico mientras combaten la
+  crisis.
 - Si Cetana vence a todos los FE/AE, `crisis.8043` recupera el control y toda la
   cadena posterior continúa de forma vanilla.
 - Si el titán de Cetana es destruido prematuramente, el mod impide que arranque
@@ -35,8 +41,7 @@ capital FE/AE y elimina las reglas que fuerzan prácticamente su victoria:
   vanilla completo, incluidos los trackers necesarios para **All Crises**.
 
 No se ha usado `kill_country`, no se ha modificado ningún archivo original y no
-se altera la potencia general, regeneración, velocidad, flotas o escalado de
-Cetana.
+se altera el escalado de crisis ni la potencia de las flotas menores de Cetana.
 
 ## Árbol del proyecto
 
@@ -52,6 +57,7 @@ Cetana.
 │   ├── on_actions/cfc_on_actions.txt
 │   ├── scripted_effects/cfc_scripted_effects.txt
 │   ├── scripted_triggers/cfc_scripted_triggers.txt
+│   ├── ship_sizes/cfc_synth_queen_titan.txt
 │   ├── solar_system_initializers/cfc_safe_bastille_initializer.txt
 │   ├── static_modifiers/cfc_queen_combat_modifiers.txt
 │   └── war_goals/cfc_cetana_war_goal.txt
@@ -77,9 +83,8 @@ Cetana.
 - `supported_version`: `v4.4.*`. El prefijo `v` es obligatorio en las versiones
   actuales del launcher; la versión completa validada es `v4.4.6`.
 
-El análisis y el código se hicieron contra los archivos instalados en:
-
-`/disk/sd_tb101/ignacio.garcia/steam_storage/steamapps/common/Stellaris`
+El análisis y el código se hicieron contra los archivos de una instalación
+estándar de Steam (`steamapps/common/Stellaris`) de esa misma versión.
 
 La relación concisa de archivos, eventos, efectos y puntos de integración
 vanilla está en [`docs/vanilla-analysis.md`](docs/vanilla-analysis.md). El
@@ -89,9 +94,10 @@ repositorio no contiene archivos completos ni recursos de la instalación.
 
 Durante la fase anterior a `crisis.8043`:
 
-1. Elimina sólo los dos bonus de `queen_combat_modifier` que dan a Cetana
-   `+200 %` de daño contra FE y AE. Conserva velocidad, regeneración,
-   agotamiento, bombardeo, escalado y bonus contra las demás crisis.
+1. Elimina los dos bonus de `queen_combat_modifier` que dan a Cetana `+200 %`
+   de daño contra FE y AE, y reduce su regeneración de casco del 10 % al 1 %.
+   Conserva velocidad, agotamiento, bombardeo, escalado y bonus contra las demás
+   crisis.
 2. Neutraliza y retira `beset_by_cetana` (`-90 %` de daño FE/AE contra Cetana).
 3. Redirige la selección inicial de `crisis.8005` a un planeta no habitado de un
    sistema vacío que no pertenezca a FE/AE. Después llama al efecto vanilla
@@ -101,8 +107,8 @@ Durante la fase anterior a `crisis.8043`:
 4. Intercepta en `crisis.8010/8015` sólo los sistemas FE/AE: añade el marcador
    visual de tormenta, pero no llama a `synth_queen_wipe_system`.
 5. Sustituye `crisis.8042`, que en vanilla destruye el 80 % de una flota FE y
-   después colonias. El reemplazo arranca la cadena de refuerzos `cfc.50`,
-   sanea el estado y no se reprograma.
+   después colonias. El reemplazo sanea el estado, desactiva los refuerzos y no
+   se reprograma.
 6. Da protección contra la tormenta a FE/AE para que `crisis.8024` no expulse o
    destruya sus flotas antes del combate.
 7. Añade un objetivo de guerra total de intervención. El contacto diplomático
@@ -118,24 +124,31 @@ Durante la fase anterior a `crisis.8043`:
    vanilla. Si el FE reconstruye flota o Cetana se retira, la cuenta se reinicia.
    El mismo evento vuelve a declarar la guerra `wg_end_threat` si una paz por
    statu quo mantiene la fase congelada doce meses.
-9. Sustituye el refuerzo repetido `crisis.8050` por la cadena decreciente
-   `cfc.50`: hasta 13, 11, 9, 7, 5 y 3 flotas móviles en intervalos anuales, y
-   después ninguno. Nunca le quita flotas que ya tenga.
-10. Detecta la destrucción temprana del titán mediante el mismo
+9. Desactiva el refuerzo repetido `crisis.8050`. `cfc.50` se conserva como
+   destino inerte para eventos ya programados en saves antiguos, pero no crea
+   naves nuevas.
+10. Reduce principalmente el titán: casco de 1,75 M a 1 M, blindaje añadido de 1,25 M a
+    650 K, escudo añadido de 500 K a 300 K, daño de `+200 %` a `+50 %`, cadencia
+    de `+300 %` a `+100 %` y regeneración de escudo del 5 % al 2 %. La
+    regeneración global de casco de Cetana baja además del 10 % al 1 %.
+11. El objetivo de intervención aplica `war_exhaustion = 0`; los FE/AE, que
+    usan el objetivo vanilla, reciben una reducción equivalente limitada a la
+    fase. Así no se alteran otras guerras simultáneas del jugador.
+12. Detecta la destrucción temprana del titán mediante el mismo
     `on_ship_destroyed_perp` que usa vanilla. El mod bloquea la transición tardía
     y sanea el estado de la fase; **`crisis.23015` vanilla sigue siendo quien
     ejecuta la derrota definitiva** (`end_crisis`, trackers de All Crises,
     recompensas, flags y cadena `crisis.23005/23010`), incluida la entrega de
     `r_cetanas_heart` a quien destruya el titán.
-11. Normaliza saves nuevos o cargados al inicio/carga y, como respaldo para
+13. Normaliza saves nuevos o cargados al inicio/carga y, como respaldo para
     multijugador, en el pulso mensual. Sólo escribe logs cuando cambia una fase o
     un país necesita normalización.
 
 ## Qué no cambia
 
-- Creación de Cetana, país, Titan, flotas y bases por el efecto vanilla
+- Creación de Cetana, país, flotas y bases por el efecto vanilla
   `synth_queen_spawn`; sólo se prepara previamente un objetivo inicial seguro.
-- Potencia base, regeneración, velocidad, flotas, diseños o escalado de crisis.
+- Potencia, diseños y escalado de crisis de sus flotas menores.
 - Bonus de Cetana contra Contingencia, Prethoryn o extradimensionales.
 - Guerra automática: ningún imperio normal es alistado por el mod; la
   intervención es siempre una decisión del jugador o de la IA.
@@ -152,6 +165,8 @@ No se modifica ningún archivo de la instalación. El mod reemplaza únicamente:
 
 - `queen_combat_modifier` y `beset_by_cetana`, originalmente en
   `common/static_modifiers/22_static_modifiers_machine_age.txt`.
+- `synth_queen_titan`, originalmente en
+  `common/ship_sizes/26_synth_queen.txt`.
 - `crisis.8005`, `crisis.8010`, `crisis.8015`, `crisis.8042` y `crisis.8063`,
   originalmente en
   `events/machine_age_crisis_events.txt`.
@@ -212,14 +227,14 @@ Buscar `[Cetana Fair Crisis]` en `game.log`. Se registran:
 - entrada voluntaria de un imperio, sea jugador o IA;
 - derrota militar confirmada de un FE/AE y aplicación del borrado vanilla;
 - reapertura de una guerra congelada por paz de statu quo;
-- cada oleada de refuerzos de Cetana y su agotamiento;
+- desactivación de los refuerzos de Cetana;
 - destrucción temprana del titán;
 - confirmación de cleanup tras las flags vanilla;
 - retorno a la cadena vanilla si Cetana gana.
 
 ## Plan de pruebas reproducible
 
-El procedimiento T1–T15 completo está en
+El procedimiento T1–T16 completo está en
 [`docs/testing.md`](docs/testing.md). Para todos los casos, iniciar Stellaris con
 `-debug_mode`, activar `game.log` y guardar antes de `crisis.8005`.
 

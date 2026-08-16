@@ -6,3 +6,5 @@
  cfc_cetana_intervention_war: "Early War Against Cetana"
  CFC_SAFE_BASTILLE_SYSTEM: "Somnivaya Expanse"
  CFC_SAFE_BASTILLE_WORLD: "Silent Bastille"
+ cfc_cetana_crisis_participant: "War Against the Cetana Crisis"
+ cfc_cetana_crisis_participant_desc: "This existential war generates no war exhaustion."

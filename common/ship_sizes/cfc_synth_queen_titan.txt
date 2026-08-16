@@ -1,0 +1,57 @@
+### Fair Crisis Synth Queen titan override ###
+
+# Vanilla concentrates most of Cetana's strength in one ship: 1.75M hull,
+# 1.25M armor, 500k shields, +200% damage and +300% fire rate before crisis
+# scaling. That makes the early, deliberately enabled war mechanically real but
+# practically unwinnable. Keep the unique boss profile while bringing the ship
+# into the range of a late-game coalition.
+synth_queen_titan = {
+	graphical_culture = { "synth_queen_01" }
+	entity = "synth_queen_01_mothership_entity"
+	max_speed = @speed_default
+	acceleration = 0.2
+	rotation_speed = 0.15
+	collision_radius = 16
+	modifier = {
+		ship_evasion_add = 5
+		ship_armor_add = 650000
+		ship_shield_add = 300000
+		ships_upkeep_mult = -1
+		ship_weapon_damage = 0.5
+		ship_fire_rate_mult = 1
+		ship_disengage_chance_mult = -1
+		ship_shield_regen_add_perc = 0.02
+	}
+	max_hitpoints = 1000000
+	size_multiplier = 640
+	map_counter_icon = ship_counter_128
+	icon = ship_size_military_32
+	fleet_slot_size = 8
+	section_slots = { "mid" = { locator = "part1" } }
+	num_target_locators = 0
+	is_space_station = no
+	icon_frame = 7
+	base_buildtime = 6000
+	can_have_federation_design = no
+	components_add_to_cost = no
+	is_designable = no
+	never_mia = yes
+
+	class = shipclass_military_special
+	use_shipnames_from = colossus
+
+	potential_construction = {
+		always = no
+	}
+
+	required_component_set = "power_core"
+	required_component_set = "ftl_components"
+	required_component_set = "thruster_components"
+	required_component_set = "sensor_components"
+	required_component_set = "combat_computers"
+
+	ai_ship_data = {
+		min = 1
+		max = 1
+	}
+}

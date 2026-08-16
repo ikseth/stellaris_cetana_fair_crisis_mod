@@ -7,6 +7,25 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Changed
+
+- Rebalanced only Cetana's Titan from its extreme vanilla boss values: hull,
+  armor, shields, weapon damage, fire rate and shield regeneration are reduced.
+- Reduced the Queen-wide hull regeneration from 10% to 1%; her ships retain
+  their design-specific repair components.
+- Disabled all early-phase Queen fleet replenishment. The initial fleets remain,
+  but every combat loss is now permanent; `cfc.50` is retained as an inert save
+  compatibility target for already queued events.
+- The intervention war goal now generates no war exhaustion. Fallen Empires,
+  which use vanilla `wg_end_threat`, receive an equivalent phase-only modifier.
+
+### Fixed
+
+- Removed the invalid generic `event` effect from the `crisis.8005` country
+  scope. The monthly normalizer safely detects the new crisis before expansion.
+- Removed the parameterized reinforcement effect whose bracketed diagnostic log
+  was still parsed as an invalid macro entry by the game.
+
 ## [1.2.1] - 2026-08-11
 
 First release actually loaded by the game with the mod enabled in a playset.

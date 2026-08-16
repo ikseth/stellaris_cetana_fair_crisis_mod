@@ -11,8 +11,8 @@ and integration points without reproducing complete copyrighted game files.
 - Launcher raw version: **v4.4.6**. Mod descriptors use `v4.4.*`; current
   launchers require the `v` prefix when evaluating `supported_version`.
 - Required DLC: **The Machine Age** (`dlc032_machine_age`)
-- Installation inspected:
-  `/disk/sd_tb101/ignacio.garcia/steam_storage/steamapps/common/Stellaris`
+- Installation inspected: a standard Steam install of that version
+  (`steamapps/common/Stellaris`)
 
 All paths below are relative to that installation. Line numbers are omitted
 because minor game updates can move definitions without changing their IDs.
@@ -84,9 +84,9 @@ normalization and early-phase cleanup.
 - `beset_by_cetana`: applies `-90%` damage against the `synth_queen` country
   type.
 
-The mod redefines these two keys only. It preserves every legitimate property
-of `queen_combat_modifier`, omitting only its FE/AE-specific damage entries,
-and makes the `beset_by_cetana` damage adjustment neutral.
+The mod redefines these two keys. It omits the FE/AE-specific damage entries,
+reduces the Queen-wide hull regeneration from 10% to 1%, preserves the other
+properties, and makes the `beset_by_cetana` damage adjustment neutral.
 
 ### `common/country_types/00_country_types.txt`
 
@@ -164,9 +164,9 @@ override them. Instead, it deliberately delegates final victory to
 |---|---|
 | `crisis.8005` | Selects an empty non-FE bastille candidate, then calls the full vanilla spawn effect. |
 | `crisis.8010`, `crisis.8015` | Preserve timers/normal expansion; replace FE/AE wipes with visual storm only. |
-| `queen_combat_modifier` | Removes only FE/AE-specific damage bonuses. |
+| `queen_combat_modifier` | Removes FE/AE-specific damage bonuses and reduces hull regeneration from 10% to 1%. |
 | `beset_by_cetana` | Neutralizes its damage penalty and removes live instances. |
-| `crisis.8042` | Retains `crisis.8050`; replaces destructive/rescheduling behavior with one-shot cleanup. |
+| `crisis.8042` | Disables `crisis.8050`; replaces destructive/rescheduling behavior with one-shot cleanup. |
 | `crisis.8063` | Adds voluntary intervention while retaining the vanilla close option. |
 | `on_war_beginning` | Grants bypass flags only to countries actually fighting Cetana. |
 | `on_ship_destroyed_perp` | Detects an early Titan loss and prepares safe cleanup. |

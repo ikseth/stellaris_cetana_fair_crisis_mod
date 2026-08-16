@@ -135,16 +135,25 @@ one roll per empire per year, and no roll at all from an empire whose fleet
 power is below Cetana's. No AI empire is ever enlisted automatically, and none
 of them is dragged in by the player's own intervention.
 
-## T14 — reinforcements diminish
+## T14 — no reinforcements
 
-Record Cetana's mobile fleet count right after each `Cetana reinforcement wave
-applied` log.
+Destroy one of Cetana's initial mobile fleets and advance at least seven game
+years.
 
-Expected: fleet counts topped up to 13, 11, 9, 7, 5 and 3 at roughly yearly
-intervals, then `reinforcement waves exhausted` and no further replacement. A
-wave never removes fleets she already has.
+Expected: the fleet is never replaced. A save with a legacy `cfc.50` event
+already queued logs `Cetana reinforcements disabled` but creates no ships.
 
-## T15 — status quo peace does not freeze the crisis
+## T15 — Titan and war-exhaustion balance
+
+Join the early war with a late-game coalition around 4M displayed fleet power,
+then fight the Titan in friendly territory. Record both sides' fleet power and
+war exhaustion before and after the battle.
+
+Expected: the Titan remains a boss-scale target but is no longer displayed near
+its old 7.36M value in a 1x crisis game. A prepared coalition can damage or
+destroy it with heavy losses. The participant's war exhaustion does not rise.
+
+## T16 — status quo peace does not freeze the crisis
 
 Force or wait for a status quo peace between an FE and Cetana.
 

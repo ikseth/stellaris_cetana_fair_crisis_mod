@@ -122,9 +122,9 @@ so it did not protect FE/AE fleets from spawn or the first two expansion passes.
 
 ### 7. What did the current mod already correct correctly?
 
-- Its `queen_combat_modifier` replacement removes only Cetana's FE/AE `+200%`
-  damage entries and preserves speed, regeneration, war exhaustion,
-  bombardment and damage against other crisis types.
+- Its `queen_combat_modifier` replacement removes Cetana's FE/AE `+200%`
+  damage entries and reduces hull regeneration from 10% to 1%, while preserving
+  speed, war exhaustion, bombardment and damage against other crisis types.
 - Its neutral `beset_by_cetana` definition removes the FE/AE `-90%` anti-Cetana
   penalty; the normalizer also removes saved instances.
 - Its `crisis.8042` override prevents the recursive 80% fleet purge and colony
@@ -171,8 +171,11 @@ months. The removal is unchanged vanilla; its precondition is now a war result.
 every tick of the endless `crisis.8042` chain. The 1.1.0 override kept exactly
 one call, which is neither the vanilla behaviour nor a neutral one: Fallen
 Empires rebuild ships and Cetana would not, so the phase drifted towards her
-defeat by default. `cfc.50` replaces it with 13, 11, 9, 7, 5, 3 and then
-nothing, at yearly intervals.
+defeat by default. Version 1.2.0 first replaced it with diminishing waves. Live
+testing then showed that Cetana's initial forces and Titan were already strong
+enough that even those finite replacements made player attrition disproportionate;
+the current version disables all replacement and keeps `cfc.50` only as an inert
+compatibility target for events serialized by older saves.
 
 ### 10. `wg_end_threat` permits status quo, and vanilla never noticed
 

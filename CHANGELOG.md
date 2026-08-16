@@ -7,6 +7,8 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-16
+
 ### Changed
 
 - Rebalanced only Cetana's Titan from its extreme vanilla boss values: hull,
@@ -156,7 +158,8 @@ The three defects below were found in that run's `error.log`.
 - Diagnostic logging with the `[Cetana Fair Crisis]` prefix.
 - Technical vanilla analysis and reproducible test plan.
 
-[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/ikseth/stellaris_cetana_fair_crisis_mod/compare/v1.0.3...v1.1.0

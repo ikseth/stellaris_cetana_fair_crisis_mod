@@ -13,7 +13,7 @@
 
 ### Mandatory preflight
 
-1. In the launcher's selected playset, verify that **Cetana Fair Crisis 1.2.1**
+1. In the launcher's selected playset, verify that **Cetana Fair Crisis 1.3.0**
    is enabled, not merely present in the library.
 2. After launch, verify that `dlc_load.json` lists
    `mod/cetana_fair_crisis.mod` under `enabled_mods`.
